@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import ku.cs.task_management.requests.member_requests.edit_profile.MemberEditProfileRequest;
 import lombok.Data;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -19,6 +20,9 @@ public class Member {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "email_fk")
     private MemberDetail detail;
+
+    @OneToMany(mappedBy = "projectOwner", cascade = CascadeType.ALL)
+    private List<Project> projects;
 
     public void updateMemberDetail(MemberDetail detail) {
         // set password to latest
