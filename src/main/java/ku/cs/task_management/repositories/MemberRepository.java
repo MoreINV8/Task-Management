@@ -17,4 +17,9 @@ public interface MemberRepository extends JpaRepository<Member, UUID> {
     Member findMemberByEmail(@Param("email") String email);
 
     Member findMemberByMemberId(UUID memberId);
+
+    @Query(
+            value = "SELECT m.detail.memberEmail FROM Member m WHERE m.memberId = :id"
+    )
+    String findMemberEmailByMemberId(@Param("id") UUID memberId);
 }

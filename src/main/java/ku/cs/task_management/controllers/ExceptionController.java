@@ -1,6 +1,7 @@
 package ku.cs.task_management.controllers;
 
 import ku.cs.task_management.exceptions.NotFoundMemberException;
+import ku.cs.task_management.exceptions.SamePasswordException;
 import ku.cs.task_management.exceptions.UnavailableEmailException;
 import ku.cs.task_management.exceptions.WrongPasswordException;
 import ku.cs.task_management.responses.ExceptionResponse;
@@ -30,6 +31,14 @@ public class ExceptionController {
 
     @ExceptionHandler(WrongPasswordException.class)
     public ResponseEntity<ExceptionResponse> wrongPasswordExceptionHandler(WrongPasswordException e) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        String message = e.getMessage();
+
+        return new ResponseEntity<>(new ExceptionResponse(message, status), status);
+    }
+
+    @ExceptionHandler(SamePasswordException.class)
+    public ResponseEntity<ExceptionResponse> samePasswordExceptionHandler(SamePasswordException e) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         String message = e.getMessage();
 
