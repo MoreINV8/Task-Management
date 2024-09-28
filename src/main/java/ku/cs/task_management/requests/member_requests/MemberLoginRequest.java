@@ -1,4 +1,4 @@
-package ku.cs.task_management.requests;
+package ku.cs.task_management.requests.member_requests;
 
 import lombok.Data;
 

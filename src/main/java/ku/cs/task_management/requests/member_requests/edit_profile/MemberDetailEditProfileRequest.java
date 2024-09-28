@@ -1,13 +1,12 @@
-package ku.cs.task_management.requests;
+package ku.cs.task_management.requests.member_requests.edit_profile;
 
 import lombok.Data;
 
 @Data
-public class MemberDetailRequest {
+public class MemberDetailEditProfileRequest {
     private String memberEmail;
     private String memberName;
     private String memberLastname;
-    private String memberPassword;
     private String username;
     private String img;
 }
