@@ -5,12 +5,10 @@ import ku.cs.task_management.entities.Project;
 import ku.cs.task_management.exceptions.NotFoundMemberException;
 import ku.cs.task_management.repositories.MemberRepository;
 import ku.cs.task_management.repositories.ProjectRepository;
-import ku.cs.task_management.requests.project_requests.ProjectCreateRequest;
+import ku.cs.task_management.requests.project_requests.ProjectRequest;
 import ku.cs.task_management.responses.ProjectResponse;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -38,7 +36,16 @@ public class ProjectService {
     }
 
     // Get all projects by owner
-    public List<ProjectResponse> getAllProjectsByOwnerId(UUID memberId) {
+    public List<ProjectResponse> getAllProjectsByOwnerId(UUID memberId)
+        throws NotFoundMemberException {
+
+        Member member = memberRepository.findMemberByMemberId(memberId);
+        String email = member.getDetail().getMemberEmail();
+
+        if(!isAccountExist(memberId)) {
+            throw new NotFoundMemberException(email);
+        }
+
         List<ProjectResponse> responses = new ArrayList<>();
         List<Project> projects = projectRepository.findAllByProjectOwnerMemberId(memberId);
         for (Project project : projects) {
@@ -48,7 +55,7 @@ public class ProjectService {
     }
 
     // Create a new project
-    public ProjectResponse createProject(ProjectCreateRequest request)
+    public ProjectResponse createProject(ProjectRequest request)
             throws NotFoundMemberException {
         /**
         * highlight: need to recheck again about the exception
@@ -56,7 +63,7 @@ public class ProjectService {
         Member member = memberRepository.findMemberByMemberId(request.getProjectOwnerId());
         String email = member.getDetail().getMemberEmail();
 
-        if(!isAccountExist(request.getProjectOwnerId())) {
+        if(!isAccountExist(member.getMemberId())) {
             throw new NotFoundMemberException(email);
         }
         Project project = new Project();
@@ -65,8 +72,7 @@ public class ProjectService {
         project.setProjectDescription(request.getProjectDescription());
         project.setProjectDeadline(request.getProjectDeadline());
 
-        Member projectOwner = memberRepository.findById(request.getProjectOwnerId()).orElseThrow(() -> new RuntimeException("Member not found"));
-        project.setProjectOwner(projectOwner);
+        project.setProjectOwner(member);
 
         Project createdProject = projectRepository.save(project);
         return modelMapper.map(createdProject, ProjectResponse.class);
