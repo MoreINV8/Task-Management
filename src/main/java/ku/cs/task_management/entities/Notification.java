@@ -3,7 +3,7 @@ package ku.cs.task_management.entities;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.Date;
+import java.sql.Date;
 import java.util.UUID;
 
 @Data
@@ -22,7 +22,7 @@ public class Notification {
     private String notificationDetail;
 
     @Column(name = "notification_status")
-    private short notificationStatus;
+    private int notificationStatus;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "project_id_fk")

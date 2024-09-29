@@ -1,9 +1,6 @@
 package ku.cs.task_management.controllers;
 
-import ku.cs.task_management.exceptions.NotFoundMemberException;
-import ku.cs.task_management.exceptions.SamePasswordException;
-import ku.cs.task_management.exceptions.UnavailableEmailException;
-import ku.cs.task_management.exceptions.WrongPasswordException;
+import ku.cs.task_management.exceptions.*;
 import ku.cs.task_management.responses.ExceptionResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +36,22 @@ public class ExceptionController {
 
     @ExceptionHandler(SamePasswordException.class)
     public ResponseEntity<ExceptionResponse> samePasswordExceptionHandler(SamePasswordException e) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        String message = e.getMessage();
+
+        return new ResponseEntity<>(new ExceptionResponse(message, status), status);
+    }
+
+    @ExceptionHandler(InvalidNotificationTypeException.class)
+    public ResponseEntity<ExceptionResponse> invalidNotificationTypeExceptionHandler(InvalidNotificationTypeException e) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        String message = e.getMessage();
+
+        return new ResponseEntity<>(new ExceptionResponse(message, status), status);
+    }
+
+    @ExceptionHandler(InvalidRequestException.class)
+    public ResponseEntity<ExceptionResponse> invalidRequestExceptionHandler(InvalidRequestException e) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         String message = e.getMessage();
 
