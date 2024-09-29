@@ -5,7 +5,6 @@ import ku.cs.task_management.entities.Project;
 import ku.cs.task_management.exceptions.NotFoundMemberException;
 import ku.cs.task_management.exceptions.NotFoundProjectException;
 import ku.cs.task_management.repositories.MemberRepository;
-import ku.cs.task_management.repositories.ProjectRepository;
 import ku.cs.task_management.requests.project_requests.ProjectRequest;
 import ku.cs.task_management.responses.ProjectResponse;
 import ku.cs.task_management.services.ProjectService;
@@ -15,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 public class ProjectController {
@@ -45,15 +45,17 @@ public class ProjectController {
     }
 
 
-    @PutMapping("/project/{email}/{project_name}/edit")
-    public ResponseEntity<ProjectResponse> editProjectDetail(@PathVariable String email, @RequestBody ProjectRequest projectEditRequest)
+    @PutMapping("/project/{email}/{projectId}/edit")
+    public ResponseEntity<ProjectResponse> editProjectDetail(@PathVariable String email,
+                                                             @PathVariable UUID projectId,
+                                                             @RequestBody ProjectRequest projectEditRequest)
             throws NotFoundMemberException, NotFoundProjectException {
         Member member = memberRepository.findMemberByEmail(email);
         if (member == null) {
             throw new NotFoundMemberException(email);
         }
 
-        return new ResponseEntity<>(projectService.updateProject(projectEditRequest), HttpStatus.OK);
+        return new ResponseEntity<>(projectService.updateProject(projectId, projectEditRequest, member.getMemberId()), HttpStatus.OK);
     }
 
 }

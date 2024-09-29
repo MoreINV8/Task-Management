@@ -36,8 +36,6 @@ public class ProjectService {
         return memberRepository.findMemberByMemberId(memberId) != null;
     }
 
-    public boolean isProjectExist(UUID projectId) {return projectRepository.findById(projectId).isPresent();}
-
     // Get all projects by owner
     public List<ProjectResponse> getAllProjectsByOwnerId(UUID memberId)
         throws NotFoundMemberException {
@@ -82,21 +80,18 @@ public class ProjectService {
     }
 
     // update exist project
-    public ProjectResponse updateProject(ProjectRequest request)
-        throws NotFoundProjectException {
+    public ProjectResponse updateProject(UUID projectId, ProjectRequest request, UUID memberId) throws NotFoundProjectException {
 
-        if (!isProjectExist(request.getProjectId())) {
-            throw new NotFoundProjectException();
-        }
+        // Check if project exists and belongs to the member
+        Project project = projectRepository.findById(projectId)
+                .filter(p -> p.getProjectOwner().getMemberId().equals(memberId))
+                .orElseThrow(() -> new NotFoundProjectException(projectId));
 
-        Project existingProject = projectRepository.findById(request.getProjectId()).get();
+        project.setProjectName(request.getProjectName());
+        project.setProjectDescription(request.getProjectDescription());
+        project.setProjectDeadline(request.getProjectDeadline());
 
-        existingProject.setProjectName(request.getProjectName());
-        existingProject.setProjectDescription(request.getProjectDescription());
-        existingProject.setProjectDeadline(request.getProjectDeadline());
-
-        Project updatedProject = projectRepository.save(existingProject);
-
+        Project updatedProject = projectRepository.save(project);
         return modelMapper.map(updatedProject, ProjectResponse.class);
     }
 }
