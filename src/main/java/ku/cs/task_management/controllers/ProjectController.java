@@ -3,6 +3,7 @@ package ku.cs.task_management.controllers;
 import ku.cs.task_management.entities.Member;
 import ku.cs.task_management.entities.Project;
 import ku.cs.task_management.exceptions.NotFoundMemberException;
+import ku.cs.task_management.exceptions.NotFoundProjectException;
 import ku.cs.task_management.repositories.MemberRepository;
 import ku.cs.task_management.repositories.ProjectRepository;
 import ku.cs.task_management.requests.project_requests.ProjectRequest;
@@ -43,16 +44,16 @@ public class ProjectController {
         return new ResponseEntity<>(projectService.createProject(projectCreateRequest), HttpStatus.CREATED);
     }
 
-    /*
-        @PutMapping("/project/{email}/{project_name}/edit")
-        public ResponseEntity<ProjectResponse> editProjectDetail(@PathVariable String email, @PathVariable String project_name,
-                                                                 @RequestBody ProjectRequest projectEditRequest)
-            throws NotFoundMemberException {
-            Member member = memberRepository.findMemberByEmail(email);
-            if (member == null) {
-                throw new NotFoundMemberException(email);
-            }
 
+    @PutMapping("/project/{email}/{project_name}/edit")
+    public ResponseEntity<ProjectResponse> editProjectDetail(@PathVariable String email, @RequestBody ProjectRequest projectEditRequest)
+            throws NotFoundMemberException, NotFoundProjectException {
+        Member member = memberRepository.findMemberByEmail(email);
+        if (member == null) {
+            throw new NotFoundMemberException(email);
         }
-     */
+
+        return new ResponseEntity<>(projectService.updateProject(projectEditRequest), HttpStatus.OK);
+    }
+
 }

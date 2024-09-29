@@ -3,6 +3,7 @@ package ku.cs.task_management.services;
 import ku.cs.task_management.entities.Member;
 import ku.cs.task_management.entities.Project;
 import ku.cs.task_management.exceptions.NotFoundMemberException;
+import ku.cs.task_management.exceptions.NotFoundProjectException;
 import ku.cs.task_management.repositories.MemberRepository;
 import ku.cs.task_management.repositories.ProjectRepository;
 import ku.cs.task_management.requests.project_requests.ProjectRequest;
@@ -35,6 +36,8 @@ public class ProjectService {
         return memberRepository.findMemberByMemberId(memberId) != null;
     }
 
+    public boolean isProjectExist(UUID projectId) {return projectRepository.findById(projectId).isPresent();}
+
     // Get all projects by owner
     public List<ProjectResponse> getAllProjectsByOwnerId(UUID memberId)
         throws NotFoundMemberException {
@@ -57,9 +60,9 @@ public class ProjectService {
     // Create a new project
     public ProjectResponse createProject(ProjectRequest request)
             throws NotFoundMemberException {
-        /**
-        * highlight: need to recheck again about the exception
-        * */
+
+        //TODO: need to recheck again about the exception
+
         Member member = memberRepository.findMemberByMemberId(request.getProjectOwnerId());
         String email = member.getDetail().getMemberEmail();
 
@@ -76,6 +79,25 @@ public class ProjectService {
 
         Project createdProject = projectRepository.save(project);
         return modelMapper.map(createdProject, ProjectResponse.class);
+    }
+
+    // update exist project
+    public ProjectResponse updateProject(ProjectRequest request)
+        throws NotFoundProjectException {
+
+        if (!isProjectExist(request.getProjectId())) {
+            throw new NotFoundProjectException();
+        }
+
+        Project existingProject = projectRepository.findById(request.getProjectId()).get();
+
+        existingProject.setProjectName(request.getProjectName());
+        existingProject.setProjectDescription(request.getProjectDescription());
+        existingProject.setProjectDeadline(request.getProjectDeadline());
+
+        Project updatedProject = projectRepository.save(existingProject);
+
+        return modelMapper.map(updatedProject, ProjectResponse.class);
     }
 }
 

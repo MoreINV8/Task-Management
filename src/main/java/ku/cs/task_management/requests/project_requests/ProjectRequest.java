@@ -7,6 +7,7 @@ import java.util.UUID;
 
 @Data
 public class ProjectRequest {
+    private UUID ProjectId;
     private String projectName;
     private String projectDescription;
     private Date projectDeadline;
