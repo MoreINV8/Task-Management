@@ -9,6 +9,7 @@ import java.util.UUID;
 public class TaskResponse {
     private UUID taskId;
     private String taskName;
-    private String taskDescription;
-    private Project taskProject;
+    private String taskDetail;
+    private int taskStatus;
+    private UUID taskProjectId;
 }

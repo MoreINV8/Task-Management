@@ -1,9 +1,14 @@
 package ku.cs.task_management.services;
 
 import ku.cs.task_management.configs.TaskStatus;
+import ku.cs.task_management.entities.Project;
 import ku.cs.task_management.entities.Task;
+import ku.cs.task_management.exceptions.NotFoundProjectException;
+import ku.cs.task_management.exceptions.NotFoundTaskException;
+import ku.cs.task_management.repositories.ProjectRepository;
 import ku.cs.task_management.repositories.TaskRepository;
-import ku.cs.task_management.requests.task_requests.TaskRequest;
+import ku.cs.task_management.requests.task_requests.TaskCreateRequest;
+import ku.cs.task_management.requests.task_requests.TaskUpdateRequest;
 import ku.cs.task_management.responses.TaskResponse;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class TaskService {
@@ -19,6 +25,8 @@ public class TaskService {
     private TaskRepository taskRepository;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private ProjectRepository projectRepository;
 
     public List<TaskResponse> getAllTasks() {
         List<TaskResponse> responses = new ArrayList<>();
@@ -29,11 +37,64 @@ public class TaskService {
     }
 
     // create task
-    public TaskResponse createTask(TaskRequest request) {
-        Task task = modelMapper.map(request, Task.class);
+    public TaskResponse createTask(TaskCreateRequest request) throws NotFoundProjectException {
+
+        Task task = new Task();
+
+        task.setTaskName(request.getTaskName());
+        task.setTaskDetail(request.getTaskDetail());
+        task.setTaskProject(projectRepository.findById(request.getTaskProjectId())
+                .orElseThrow(() -> new NotFoundProjectException(request.getTaskProjectId())));
         task.setTaskStatus(TaskStatus.TODO);
 
         Task createdTask = taskRepository.save(task);
         return modelMapper.map(createdTask, TaskResponse.class);
+    }
+
+    public List<TaskResponse> getAllTasksByProjectId(UUID projectId) throws NotFoundProjectException {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new NotFoundProjectException(projectId));
+
+        List<TaskResponse> responses = new ArrayList<>();
+        for (Task task : taskRepository.findAllByTaskProjectProjectId(projectId)) {
+            responses.add(modelMapper.map(task, TaskResponse.class));
+        }
+
+        return responses;
+    }
+
+    public TaskResponse updateDetailTask(TaskUpdateRequest request) throws NotFoundTaskException, NotFoundProjectException {
+        Task task = taskRepository.findById(request.getTaskId())
+                .orElseThrow(() -> new NotFoundTaskException(request.getTaskId()));
+
+        UUID projectId = request.getTaskProjectId();
+        projectRepository.findById(projectId).orElseThrow(() -> new NotFoundProjectException(projectId));
+
+        task.setTaskName(request.getTaskName());
+        task.setTaskDetail(request.getTaskDetail());
+        task.setTaskStatus(TaskStatus.TODO);
+
+        Task updatedTask = taskRepository.save(task);
+        return modelMapper.map(updatedTask, TaskResponse.class);
+    }
+
+    public TaskResponse deleteTask(UUID projectId, UUID taskId) throws NotFoundProjectException, NotFoundTaskException {
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new NotFoundProjectException(projectId));
+
+        // find the task within the project
+        Task task = project.getProjectTasks().stream()
+                .filter(t -> t.getTaskId().equals(taskId))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundTaskException(taskId));
+
+        // remove the task from the project
+        project.getProjectTasks().remove(task);
+        projectRepository.save(project);
+
+        taskRepository.delete(task);
+
+        return modelMapper.map(task, TaskResponse.class);
     }
 }
