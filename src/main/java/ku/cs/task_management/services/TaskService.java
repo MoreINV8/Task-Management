@@ -63,7 +63,7 @@ public class TaskService {
         return responses;
     }
 
-    public TaskResponse updateDetailTask(TaskUpdateRequest request) throws NotFoundTaskException, NotFoundProjectException {
+    public TaskResponse updateTaskDetail(TaskUpdateRequest request) throws NotFoundTaskException, NotFoundProjectException {
         Task task = taskRepository.findById(request.getTaskId())
                 .orElseThrow(() -> new NotFoundTaskException(request.getTaskId()));
 
@@ -72,7 +72,6 @@ public class TaskService {
 
         task.setTaskName(request.getTaskName());
         task.setTaskDetail(request.getTaskDetail());
-        task.setTaskStatus(TaskStatus.TODO);
 
         Task updatedTask = taskRepository.save(task);
         return modelMapper.map(updatedTask, TaskResponse.class);
@@ -94,6 +93,31 @@ public class TaskService {
         projectRepository.save(project);
 
         taskRepository.delete(task);
+
+        return modelMapper.map(task, TaskResponse.class);
+    }
+
+    public TaskResponse getTaskDetail(UUID projectId, UUID taskId) throws NotFoundProjectException, NotFoundTaskException {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new NotFoundProjectException(projectId));
+
+        // find the task within the project
+        Task task = project.getProjectTasks().stream()
+                .filter(t -> t.getTaskId().equals(taskId))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundTaskException(taskId));
+
+        return modelMapper.map(task, TaskResponse.class);
+    }
+
+    // Method to change task status
+    public TaskResponse changeTaskStatus(UUID taskId, int newStatus) throws NotFoundTaskException {
+
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new NotFoundTaskException(taskId));
+
+        task.setTaskStatus(newStatus);
+        taskRepository.save(task);
 
         return modelMapper.map(task, TaskResponse.class);
     }

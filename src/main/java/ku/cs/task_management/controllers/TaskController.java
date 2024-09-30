@@ -27,23 +27,36 @@ public class TaskController {
 
     @GetMapping("/{projectId}/task")
     public ResponseEntity<List<TaskResponse>> getAllTasksByProjectId(@PathVariable UUID projectId) throws NotFoundProjectException {
-        return new ResponseEntity<>(taskService.getAllTasksByProjectId(projectId), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(taskService.getAllTasksByProjectId(projectId), HttpStatus.OK);
     }
-    @PostMapping("/{projectId}/task/create")
+
+    @GetMapping("{projectId}/task/{taskId}")
+    public ResponseEntity<TaskResponse> getTaskDetail(@PathVariable UUID projectId, @PathVariable UUID taskId)
+            throws NotFoundProjectException, NotFoundTaskException {
+        return new ResponseEntity<>(taskService.getTaskDetail(projectId, taskId), HttpStatus.OK);
+    }
+    @PostMapping("/{projectId}/task")
     public ResponseEntity<TaskResponse> createTask(@RequestBody TaskCreateRequest request)
         throws NotFoundProjectException {
         return new ResponseEntity<>(taskService.createTask(request), HttpStatus.CREATED);
     }
 
-    @PutMapping("/{projectId}/task/edit")
-    public ResponseEntity<TaskResponse> updateDetailTask(@RequestBody TaskUpdateRequest request)
+    @PutMapping("/{projectId}/task")
+    public ResponseEntity<TaskResponse> updateTaskDetail(@RequestBody TaskUpdateRequest request)
             throws NotFoundProjectException, NotFoundTaskException {
-        return new ResponseEntity<>(taskService.updateDetailTask(request), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(taskService.updateTaskDetail(request), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{projectId}/{taskId}/delete")
+    // TODO: how we get the status to change, check it again later
+    @PutMapping("/{projectId}/{taskId}/status")
+    public ResponseEntity<TaskResponse> updateTaskStatus(@PathVariable UUID taskId, @RequestParam int status)
+            throws NotFoundTaskException {
+        return new ResponseEntity<>(taskService.changeTaskStatus(taskId, status), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{projectId}/{taskId}")
     public ResponseEntity<TaskResponse> deleteTask(@PathVariable UUID projectId, @PathVariable UUID taskId)
             throws NotFoundProjectException, NotFoundTaskException {
-        return new ResponseEntity<>(taskService.deleteTask(projectId, taskId), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(taskService.deleteTask(projectId, taskId), HttpStatus.NO_CONTENT);
     }
 }

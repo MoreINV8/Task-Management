@@ -9,5 +9,6 @@ public class TaskUpdateRequest {
     private UUID taskId;
     private String taskName;
     private String taskDetail;
+    private String taskStatus;
     private UUID taskProjectId;
 }
