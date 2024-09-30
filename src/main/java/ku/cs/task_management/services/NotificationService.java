@@ -6,15 +6,22 @@ import ku.cs.task_management.entities.Notification;
 import ku.cs.task_management.exceptions.InvalidNotificationTypeException;
 import ku.cs.task_management.exceptions.InvalidRequestException;
 import ku.cs.task_management.exceptions.NotFoundMemberException;
+import ku.cs.task_management.exceptions.NotFoundNotificationException;
 import ku.cs.task_management.repositories.*;
 import ku.cs.task_management.requests.notification_requests.NotificationSendRequest;
 import ku.cs.task_management.responses.NotificationResponse;
+import ku.cs.task_management.responses.SuccessResponse;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class NotificationService {
@@ -78,16 +85,85 @@ public class NotificationService {
         }
 
         // get response
-        NotificationResponse response = modelMapper.map(notificationRepository.save(notification), NotificationResponse.class);
+        return getResponse(notificationRepository.save(notification));
+    }
 
-        //TODO: ถ้าทำเสร็จแล้วอย่ากส่งเป็น object ออกไปเลยค่อยมาแก้
+    public List<NotificationResponse> getNotificationFromMemberId(String mId)
+            throws NotFoundMemberException, IllegalArgumentException {
+        // convert string to uuid
+        UUID receiverId = UUID.fromString(mId);
+
+        // check if member account existed
+        if (memberRepository.findMemberByMemberId(receiverId) == null) {
+            throw new NotFoundMemberException(memberRepository.findMemberEmailByMemberId(receiverId));
+        }
+
+        // retrieve notifications of this member
+        List<NotificationResponse> notifications = new ArrayList<>();
+        for (Notification notification : notificationRepository.getNotificationsByReceiverId(receiverId)) {
+            notifications.add(getResponse(notification));
+        }
+
+        return notifications;
+    }
+
+    public NotificationResponse readNotification(String nId)
+            throws NotFoundNotificationException, IllegalArgumentException {
+        // convert string to uuid
+        UUID notificationId = UUID.fromString(nId);
+
+        // check if notification existed
+        if (!notificationRepository.existsById(notificationId)) {
+            throw new NotFoundNotificationException(nId);
+        }
+
+        // set notification status to read
+        Notification notification = notificationRepository.getReferenceById(notificationId);
+        notification.setNotificationStatus(NotificationStatus.READ);
+
+        // save notification to database
+        return getResponse(notificationRepository.save(notification));
+    }
+
+    public SuccessResponse deleteNotification(String nId)
+            throws NotFoundNotificationException, IllegalArgumentException {
+        UUID notificationId = UUID.fromString(nId);
+
+        if (!notificationRepository.existsById(notificationId)) {
+            throw new NotFoundNotificationException(nId);
+        }
+
+        Notification notification = notificationRepository.getReferenceById(notificationId);
+        notification.setProject(null);
+        notification.setTask(null);
+        notification.setMeeting(null);
+        notification.setReceiver(null);
+
+        notificationRepository.save(notification);
+
+        notificationRepository.delete(notification);
+
+        return new SuccessResponse("sucess full delete notification id '" + nId + "'", HttpStatus.ACCEPTED);
+    }
+
+    private NotificationResponse getResponse(Notification notification) {
+        // formatting response
+        NotificationResponse response = modelMapper.map(notification, NotificationResponse.class);
+
         response.setReceiverId(notification.getReceiver().getMemberId());
-        response.setType(request.getType());
 
-        switch (request.getType()) {
-            case (1) -> response.setProjectId(notification.getProject().getProjectId());
-            case (2) -> response.setTaskId(notification.getTask().getTaskId());
-            case (3) -> response.setMeetingId(notification.getMeeting().getMeetingId());
+        // TODO: ถ้าทำเสร็จแล้วอย่ากส่งเป็น object ออกไปเลยค่อยมาแก้
+        if (notification.getProject() != null) {
+            response.setType(1);
+            response.setProjectId(notification.getProject().getProjectId());
+        }
+        if (notification.getTask() != null) {
+            response.setType(2);
+            response.setTaskId(notification.getTask().getTaskId());
+        }
+        if (notification.getMeeting() != null) {
+            response.setType(3);
+            response.setMeetingId(notification.getMeeting().getMeetingId());
         }
 
         return response;
