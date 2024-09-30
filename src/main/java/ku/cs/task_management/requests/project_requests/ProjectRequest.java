@@ -2,7 +2,7 @@ package ku.cs.task_management.requests.project_requests;
 
 import lombok.Data;
 
-import java.util.Date;
+import java.sql.Date;
 import java.util.UUID;
 
 @Data
