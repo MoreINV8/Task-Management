@@ -73,4 +73,20 @@ public class ExceptionController {
 
         return new ResponseEntity<>(new ExceptionResponse(message, status), status);
     }
+
+    @ExceptionHandler(NotProjectOwnerException.class)
+    public ResponseEntity<ExceptionResponse> notProjectOwnerExceptionHandler(NotProjectOwnerException e) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        String message = e.getMessage();
+
+        return new ResponseEntity<>(new ExceptionResponse(message, status), status);
+    }
+
+    @ExceptionHandler(NotFoundProjectException.class)
+    public ResponseEntity<ExceptionResponse> notFoundProjectException(NotFoundProjectException e) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        String message = e.getMessage();
+
+        return new ResponseEntity<>(new ExceptionResponse(message, status), status);
+    }
 }
