@@ -4,6 +4,7 @@ import ku.cs.task_management.entities.Member;
 import ku.cs.task_management.entities.Project;
 import ku.cs.task_management.exceptions.NotFoundMemberException;
 import ku.cs.task_management.exceptions.NotFoundProjectException;
+import ku.cs.task_management.exceptions.NotProjectOwnerException;
 import ku.cs.task_management.repositories.MemberRepository;
 import ku.cs.task_management.requests.project_requests.ProjectRequest;
 import ku.cs.task_management.responses.ProjectResponse;
@@ -21,6 +22,7 @@ public class ProjectController {
 
     @Autowired
     private ProjectService projectService;
+
     @Autowired
     private MemberRepository memberRepository;
 
@@ -31,12 +33,14 @@ public class ProjectController {
 
     @GetMapping("/project/{email}")
     public ResponseEntity<List<ProjectResponse>> getAllMyProject(@PathVariable String email) throws NotFoundMemberException {
-        Member member = memberRepository.findMemberByEmail(email);
-        if (member == null) {
-            throw new NotFoundMemberException(email);
-        }
-        List<ProjectResponse> projects = projectService.getAllProjectsByOwnerId(member.getMemberId());
-        return new ResponseEntity<>(projects, HttpStatus.OK);
+        return new ResponseEntity<>(projectService.getAllProjectsByOwnerEmail(email), HttpStatus.OK);
+    }
+
+    @GetMapping("/project/{email}/{projectId}")
+    public ResponseEntity<ProjectResponse> getProjectDetail(@PathVariable String email,
+                                                             @PathVariable UUID projectId)
+        throws NotFoundMemberException, NotFoundProjectException, NotProjectOwnerException {
+        return new ResponseEntity<>(projectService.getProjectDetail(email, projectId), HttpStatus.OK);
     }
 
     @PostMapping("/project/create")
@@ -44,18 +48,11 @@ public class ProjectController {
         return new ResponseEntity<>(projectService.createProject(projectCreateRequest), HttpStatus.CREATED);
     }
 
-
     @PutMapping("/project/{email}/{projectId}/edit")
     public ResponseEntity<ProjectResponse> editProjectDetail(@PathVariable String email,
                                                              @PathVariable UUID projectId,
                                                              @RequestBody ProjectRequest projectEditRequest)
-            throws NotFoundMemberException, NotFoundProjectException {
-        Member member = memberRepository.findMemberByEmail(email);
-        if (member == null) {
-            throw new NotFoundMemberException(email);
-        }
-
-        return new ResponseEntity<>(projectService.updateProject(projectId, projectEditRequest, member.getMemberId()), HttpStatus.OK);
+            throws NotFoundMemberException, NotFoundProjectException, NotProjectOwnerException {
+        return new ResponseEntity<>(projectService.updateProject(projectId, projectEditRequest, email), HttpStatus.OK);
     }
-
 }
