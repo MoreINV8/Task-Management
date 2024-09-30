@@ -15,6 +15,9 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class NotificationService {
@@ -78,16 +81,46 @@ public class NotificationService {
         }
 
         // get response
-        NotificationResponse response = modelMapper.map(notificationRepository.save(notification), NotificationResponse.class);
+        return getResponse(notificationRepository.save(notification));
+    }
 
-        //TODO: ถ้าทำเสร็จแล้วอย่ากส่งเป็น object ออกไปเลยค่อยมาแก้
+    public List<NotificationResponse> getNotificationFromMemberId(String id)
+            throws NotFoundMemberException {
+        // convert string to uuid
+        UUID receiverId = UUID.fromString(id);
+
+        // check if member account existed
+        if (memberRepository.findMemberByMemberId(receiverId) == null) {
+            throw new NotFoundMemberException(memberRepository.findMemberEmailByMemberId(receiverId));
+        }
+
+        // retrieve notifications of this member
+        List<NotificationResponse> notifications = new ArrayList<>();
+        for (Notification notification : notificationRepository.getNotificationsByReceiverId(receiverId)) {
+            notifications.add(getResponse(notification));
+        }
+
+        return notifications;
+    }
+
+    private NotificationResponse getResponse(Notification notification) {
+        // formatting response
+        NotificationResponse response = modelMapper.map(notification, NotificationResponse.class);
+
         response.setReceiverId(notification.getReceiver().getMemberId());
-        response.setType(request.getType());
 
-        switch (request.getType()) {
-            case (1) -> response.setProjectId(notification.getProject().getProjectId());
-            case (2) -> response.setTaskId(notification.getTask().getTaskId());
-            case (3) -> response.setMeetingId(notification.getMeeting().getMeetingId());
+        // TODO: ถ้าทำเสร็จแล้วอย่ากส่งเป็น object ออกไปเลยค่อยมาแก้
+        if (notification.getProject() != null) {
+            response.setType(1);
+            response.setProjectId(notification.getProject().getProjectId());
+        }
+        if (notification.getTask() != null) {
+            response.setType(2);
+            response.setTaskId(notification.getTask().getTaskId());
+        }
+        if (notification.getMeeting() != null) {
+            response.setType(3);
+            response.setMeetingId(notification.getMeeting().getMeetingId());
         }
 
         return response;
