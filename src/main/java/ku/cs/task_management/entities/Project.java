@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -28,4 +29,16 @@ public class Project {
     @ManyToOne
     @JoinColumn(name = "member_fk", referencedColumnName = "member_id")
     private Member projectOwner;
+
+    @OneToMany(mappedBy = "taskProject", cascade = CascadeType.ALL)
+    private List<Task> ProjectTasks;
+
+    @OneToMany(mappedBy = "meetingProject", cascade = CascadeType.ALL)
+    private List<Meeting> ProjectMeetings;
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    private List<Notification> projectNotifications;
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    private List<Log> projectLogs;
 }
