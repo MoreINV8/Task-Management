@@ -57,4 +57,20 @@ public class ExceptionController {
 
         return new ResponseEntity<>(new ExceptionResponse(message, status), status);
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ExceptionResponse> illegalArgumentExceptionHandler(IllegalArgumentException e) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        String message = e.getMessage();
+
+        return new ResponseEntity<>(new ExceptionResponse(message, status), status);
+    }
+
+    @ExceptionHandler(NotFoundNotificationException.class)
+    public ResponseEntity<ExceptionResponse> notFoundNotificationException(NotFoundNotificationException e) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        String message = e.getMessage();
+
+        return new ResponseEntity<>(new ExceptionResponse(message, status), status);
+    }
 }

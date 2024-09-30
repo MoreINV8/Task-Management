@@ -3,6 +3,7 @@ package ku.cs.task_management.controllers;
 import ku.cs.task_management.exceptions.InvalidNotificationTypeException;
 import ku.cs.task_management.exceptions.InvalidRequestException;
 import ku.cs.task_management.exceptions.NotFoundMemberException;
+import ku.cs.task_management.exceptions.NotFoundNotificationException;
 import ku.cs.task_management.requests.notification_requests.NotificationSendRequest;
 import ku.cs.task_management.responses.NotificationResponse;
 import ku.cs.task_management.services.NotificationService;
@@ -27,7 +28,13 @@ public class NotificationController {
 
     @GetMapping("/notification&m={memberId}")
     public ResponseEntity<List<NotificationResponse>> getNotificationsOfMember(@PathVariable String memberId)
-            throws NotFoundMemberException {
+            throws NotFoundMemberException, IllegalArgumentException {
         return ResponseEntity.ok(notificationService.getNotificationFromMemberId(memberId));
+    }
+
+    @PutMapping("/notification&n={notificationId}")
+    public ResponseEntity<NotificationResponse> readNotification(@PathVariable String notificationId)
+            throws NotFoundNotificationException, IllegalArgumentException {
+        return new ResponseEntity<>(notificationService.readNotification(notificationId), HttpStatus.ACCEPTED);
     }
 }

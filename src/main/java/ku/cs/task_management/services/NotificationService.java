@@ -6,6 +6,7 @@ import ku.cs.task_management.entities.Notification;
 import ku.cs.task_management.exceptions.InvalidNotificationTypeException;
 import ku.cs.task_management.exceptions.InvalidRequestException;
 import ku.cs.task_management.exceptions.NotFoundMemberException;
+import ku.cs.task_management.exceptions.NotFoundNotificationException;
 import ku.cs.task_management.repositories.*;
 import ku.cs.task_management.requests.notification_requests.NotificationSendRequest;
 import ku.cs.task_management.responses.NotificationResponse;
@@ -84,10 +85,10 @@ public class NotificationService {
         return getResponse(notificationRepository.save(notification));
     }
 
-    public List<NotificationResponse> getNotificationFromMemberId(String id)
-            throws NotFoundMemberException {
+    public List<NotificationResponse> getNotificationFromMemberId(String mId)
+            throws NotFoundMemberException, IllegalArgumentException {
         // convert string to uuid
-        UUID receiverId = UUID.fromString(id);
+        UUID receiverId = UUID.fromString(mId);
 
         // check if member account existed
         if (memberRepository.findMemberByMemberId(receiverId) == null) {
@@ -101,6 +102,20 @@ public class NotificationService {
         }
 
         return notifications;
+    }
+
+    public NotificationResponse readNotification(String nId)
+            throws NotFoundNotificationException, IllegalArgumentException {
+        UUID notificationId = UUID.fromString(nId);
+
+        if (!notificationRepository.existsById(notificationId)) {
+            throw new NotFoundNotificationException(nId);
+        }
+
+        Notification notification = notificationRepository.getReferenceById(notificationId);
+        notification.setNotificationStatus(NotificationStatus.READ);
+
+        return getResponse(notificationRepository.save(notification));
     }
 
     private NotificationResponse getResponse(Notification notification) {
