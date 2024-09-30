@@ -10,8 +10,11 @@ import ku.cs.task_management.exceptions.NotFoundNotificationException;
 import ku.cs.task_management.repositories.*;
 import ku.cs.task_management.requests.notification_requests.NotificationSendRequest;
 import ku.cs.task_management.responses.NotificationResponse;
+import ku.cs.task_management.responses.SuccessResponse;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
@@ -106,6 +109,24 @@ public class NotificationService {
 
     public NotificationResponse readNotification(String nId)
             throws NotFoundNotificationException, IllegalArgumentException {
+        // convert string to uuid
+        UUID notificationId = UUID.fromString(nId);
+
+        // check if notification existed
+        if (!notificationRepository.existsById(notificationId)) {
+            throw new NotFoundNotificationException(nId);
+        }
+
+        // set notification status to read
+        Notification notification = notificationRepository.getReferenceById(notificationId);
+        notification.setNotificationStatus(NotificationStatus.READ);
+
+        // save notification to database
+        return getResponse(notificationRepository.save(notification));
+    }
+
+    public SuccessResponse deleteNotification(String nId)
+            throws NotFoundNotificationException, IllegalArgumentException {
         UUID notificationId = UUID.fromString(nId);
 
         if (!notificationRepository.existsById(notificationId)) {
@@ -113,9 +134,16 @@ public class NotificationService {
         }
 
         Notification notification = notificationRepository.getReferenceById(notificationId);
-        notification.setNotificationStatus(NotificationStatus.READ);
+        notification.setProject(null);
+        notification.setTask(null);
+        notification.setMeeting(null);
+        notification.setReceiver(null);
 
-        return getResponse(notificationRepository.save(notification));
+        notificationRepository.save(notification);
+
+        notificationRepository.delete(notification);
+
+        return new SuccessResponse("sucess full delete notification id '" + nId + "'", HttpStatus.ACCEPTED);
     }
 
     private NotificationResponse getResponse(Notification notification) {

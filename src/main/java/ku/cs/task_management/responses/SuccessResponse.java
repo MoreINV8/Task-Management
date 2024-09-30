@@ -4,12 +4,12 @@ import lombok.Data;
 import org.springframework.http.HttpStatus;
 
 @Data
-public class ExceptionResponse {
+public class SuccessResponse {
     private HttpStatus status;
-    private String error;
+    private String message;
 
-    public ExceptionResponse(String error, HttpStatus status) {
-        this.error = error;
+    public SuccessResponse(String message, HttpStatus status) {
         this.status = status;
+        this.message = message;
     }
 }

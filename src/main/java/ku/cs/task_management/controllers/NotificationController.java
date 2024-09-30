@@ -6,6 +6,7 @@ import ku.cs.task_management.exceptions.NotFoundMemberException;
 import ku.cs.task_management.exceptions.NotFoundNotificationException;
 import ku.cs.task_management.requests.notification_requests.NotificationSendRequest;
 import ku.cs.task_management.responses.NotificationResponse;
+import ku.cs.task_management.responses.SuccessResponse;
 import ku.cs.task_management.services.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,15 +27,21 @@ public class NotificationController {
         return new ResponseEntity<>(notificationService.insertNotification(request), HttpStatus.CREATED);
     }
 
-    @GetMapping("/notification&m={memberId}")
-    public ResponseEntity<List<NotificationResponse>> getNotificationsOfMember(@PathVariable String memberId)
+    @GetMapping("/notification")
+    public ResponseEntity<List<NotificationResponse>> getNotificationsOfMember(@RequestParam String m)
             throws NotFoundMemberException, IllegalArgumentException {
-        return ResponseEntity.ok(notificationService.getNotificationFromMemberId(memberId));
+        return ResponseEntity.ok(notificationService.getNotificationFromMemberId(m));
     }
 
-    @PutMapping("/notification&n={notificationId}")
-    public ResponseEntity<NotificationResponse> readNotification(@PathVariable String notificationId)
+    @PutMapping("/notification")
+    public ResponseEntity<NotificationResponse> readNotification(@RequestParam String n)
             throws NotFoundNotificationException, IllegalArgumentException {
-        return new ResponseEntity<>(notificationService.readNotification(notificationId), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(notificationService.readNotification(n), HttpStatus.ACCEPTED);
+    }
+
+    @DeleteMapping("/notification")
+    public ResponseEntity<SuccessResponse> deleteNotification(@RequestParam String n)
+            throws NotFoundNotificationException, IllegalArgumentException {
+        return new ResponseEntity<>(notificationService.deleteNotification(n), HttpStatus.ACCEPTED);
     }
 }
