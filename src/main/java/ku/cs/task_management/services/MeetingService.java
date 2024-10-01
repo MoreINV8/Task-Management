@@ -54,6 +54,16 @@ public class MeetingService {
         return modelMapper.map(createdMeeting, MeetingResponse.class);
     }
 
+    public MeetingResponse getMeetingDetail (MeetingRequest request) throws NotFoundMeetingException, NotFoundProjectException {
+        Meeting meeting = meetingRepository.findById(request.getMeetingId())
+                .orElseThrow(() -> new NotFoundMeetingException(request.getMeetingId()));
+
+        projectRepository.findById(request.getMeetingProject())
+                .orElseThrow(() -> new NotFoundProjectException(request.getMeetingProject()));
+
+        return modelMapper.map(meeting, MeetingResponse.class);
+    }
+
     public MeetingResponse updateMeeting(MeetingRequest request) throws NotFoundProjectException, NotFoundMeetingException {
         Meeting meeting = meetingRepository.findById(request.getMeetingId())
                 .orElseThrow(() -> new NotFoundMeetingException(request.getMeetingId()));
@@ -68,9 +78,11 @@ public class MeetingService {
         return modelMapper.map(updatedMeeting, MeetingResponse.class);
     }
 
+    // TODO: Do deletion need to return response body back?
     public MeetingResponse deleteMeeting(MeetingRequest request) throws NotFoundMeetingException, NotFoundProjectException {
         Project project = projectRepository.findById(request.getMeetingProject())
                 .orElseThrow(() -> new NotFoundProjectException(request.getMeetingProject()));
+
         Meeting meeting = project.getProjectMeetings().stream()
                 .filter(m -> m.getMeetingId().equals(request.getMeetingId()))
                 .findFirst()

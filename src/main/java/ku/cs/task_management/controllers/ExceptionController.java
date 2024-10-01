@@ -89,4 +89,12 @@ public class ExceptionController {
 
         return new ResponseEntity<>(new ExceptionResponse(message, status), status);
     }
+
+    @ExceptionHandler(NotFoundMeetingException.class)
+    public ResponseEntity<ExceptionResponse> notFoundMeetingException(NotFoundMeetingException e) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        String message = e.getMessage();
+
+        return new ResponseEntity<>(new ExceptionResponse(message, status), status);
+    }
 }

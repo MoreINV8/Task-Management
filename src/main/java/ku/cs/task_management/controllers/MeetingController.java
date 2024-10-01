@@ -30,6 +30,10 @@ public class MeetingController {
         return new ResponseEntity<>(meetingService.getAllMeetingByProject(projectId), HttpStatus.OK);
     }
 
+    @GetMapping("{projectId}/{meetingId}/detail")
+    public ResponseEntity<MeetingResponse> getMeetingDetail(@RequestBody MeetingRequest request) throws NotFoundMeetingException, NotFoundProjectException {
+        return new ResponseEntity<>(meetingService.getMeetingDetail(request), HttpStatus.OK);
+    }
     @PostMapping("meeting/create")
     public ResponseEntity<MeetingResponse> createMeeting(@RequestBody MeetingRequest request) throws NotFoundProjectException {
         return new ResponseEntity<>(meetingService.createMeeting(request), HttpStatus.CREATED);
