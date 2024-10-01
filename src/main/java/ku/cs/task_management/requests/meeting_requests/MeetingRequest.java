@@ -11,5 +11,5 @@ public class MeetingRequest {
     private String meetingTopic;
     private Date meetingDate;
     private String meetingLocation;
-    private UUID meetingProject;
+    private UUID meetingProjectId;
 }

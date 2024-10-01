@@ -1,5 +1,7 @@
 package ku.cs.task_management.configs;
 
+import ku.cs.task_management.entities.Meeting;
+import ku.cs.task_management.responses.MeetingResponse;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -3,6 +3,7 @@ package ku.cs.task_management.controllers;
 import ku.cs.task_management.entities.Meeting;
 import ku.cs.task_management.exceptions.NotFoundMeetingException;
 import ku.cs.task_management.exceptions.NotFoundProjectException;
+import ku.cs.task_management.requests.meeting_requests.MeetingCreateRequest;
 import ku.cs.task_management.requests.meeting_requests.MeetingRequest;
 import ku.cs.task_management.responses.MeetingResponse;
 import ku.cs.task_management.services.MeetingService;
@@ -35,7 +36,7 @@ public class MeetingController {
         return new ResponseEntity<>(meetingService.getMeetingDetail(request), HttpStatus.OK);
     }
     @PostMapping("meeting/create")
-    public ResponseEntity<MeetingResponse> createMeeting(@RequestBody MeetingRequest request) throws NotFoundProjectException {
+    public ResponseEntity<MeetingResponse> createMeeting(@RequestBody MeetingCreateRequest request) throws NotFoundProjectException {
         return new ResponseEntity<>(meetingService.createMeeting(request), HttpStatus.CREATED);
     }
 
