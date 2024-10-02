@@ -24,6 +24,9 @@ public class Member {
     @OneToMany(mappedBy = "projectOwner", cascade = CascadeType.ALL)
     private List<Project> projects;
 
+    @OneToMany(mappedBy = "commentAuthor", cascade = CascadeType.ALL)
+    private List<Comment> comments;
+
     public void updateMemberDetail(MemberDetail detail) {
         // set password to latest
         detail.setMemberPassword(this.detail.getMemberPassword());

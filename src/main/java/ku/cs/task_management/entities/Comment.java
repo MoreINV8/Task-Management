@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.sql.Date;
-import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -24,4 +23,8 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "task_fk", referencedColumnName = "task_id")
     private Task commentTask;
+
+    @ManyToOne
+    @JoinColumn(name = "member_fk", referencedColumnName = "member_id")
+    private Member commentAuthor;
 }

@@ -11,4 +11,5 @@ public class CommentRequest {
     private Date commentPostTime;
     private String commentContent;
     private UUID commentTaskId;
+    private UUID commentMemberId;
 }

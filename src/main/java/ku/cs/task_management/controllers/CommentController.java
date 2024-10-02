@@ -1,7 +1,9 @@
 package ku.cs.task_management.controllers;
 
 import ku.cs.task_management.entities.Comment;
+import ku.cs.task_management.exceptions.CommentAuthorMismatchException;
 import ku.cs.task_management.exceptions.NotFoundCommentException;
+import ku.cs.task_management.exceptions.NotFoundMemberException;
 import ku.cs.task_management.exceptions.NotFoundTaskException;
 import ku.cs.task_management.requests.comment_requests.CommentRequest;
 import ku.cs.task_management.responses.CommentResponse;
@@ -31,17 +33,17 @@ public class CommentController {
     }
 
     @PostMapping("/comment/create")
-    public ResponseEntity<CommentResponse> createComment(@RequestBody CommentRequest request) throws NotFoundTaskException {
+    public ResponseEntity<CommentResponse> createComment(@RequestBody CommentRequest request) throws NotFoundTaskException, NotFoundMemberException {
         return new ResponseEntity<>(commentService.createComment(request), HttpStatus.CREATED);
     }
 
     @PutMapping("/comment/edit")
-    public ResponseEntity<CommentResponse> editComment(@RequestBody CommentRequest request) throws NotFoundTaskException, NotFoundCommentException {
+    public ResponseEntity<CommentResponse> editComment(@RequestBody CommentRequest request) throws NotFoundTaskException, NotFoundCommentException, CommentAuthorMismatchException {
         return new ResponseEntity<>(commentService.editComment(request), HttpStatus.OK);
     }
 
     @DeleteMapping("/comment/delete")
-    public ResponseEntity<CommentResponse> deleteComment(@RequestBody CommentRequest request) throws NotFoundTaskException, NotFoundCommentException {
+    public ResponseEntity<CommentResponse> deleteComment(@RequestBody CommentRequest request) throws NotFoundTaskException, NotFoundCommentException, CommentAuthorMismatchException {
         return new ResponseEntity<>(commentService.deleteComment(request), HttpStatus.OK);
     }
 }

@@ -105,4 +105,20 @@ public class ExceptionController {
 
         return new ResponseEntity<>(new ExceptionResponse(message, status), status);
     }
+
+    @ExceptionHandler(CommentAuthorMismatchException.class)
+    public ResponseEntity<ExceptionResponse> commentAuthorMismatchException(CommentAuthorMismatchException e) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        String message = e.getMessage();
+
+        return new ResponseEntity<>(new ExceptionResponse(message, status), status);
+    }
+
+    @ExceptionHandler(NotFoundTaskException.class)
+    public ResponseEntity<ExceptionResponse> notFoundTaskException(NotFoundTaskException e) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        String message = e.getMessage();
+
+        return new ResponseEntity<>(new ExceptionResponse(message, status), status);
+    }
 }
