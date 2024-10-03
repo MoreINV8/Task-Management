@@ -39,12 +39,15 @@ public class AssignmentService {
         return assignmentRepository.findAll();
     }
 
+    // TODO: return in List of Object or just return in List of UUID, which one is better
     public List<AssignResponse> getAllMembersByProjectId(UUID projectId) throws NotFoundProjectException {
         projectRepository.findById(projectId).orElseThrow(() -> new NotFoundProjectException(projectId));
         List<AssignResponse> responses = new ArrayList<>();
         for (Assignment assignment : assignmentRepository.findAllByProjectProjectId(projectId)) {
             AssignResponse response = new AssignResponse();
-            response.setMember(assignment.getMember().getMemberId());
+            response.setMemberId(assignment.getMember().getMemberId());
+            response.setMemberName(assignment.getMember().getDetail().getMemberName());
+            response.setRole(assignment.getRole());
             responses.add(response);
         }
         return responses;

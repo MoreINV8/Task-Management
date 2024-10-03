@@ -6,5 +6,7 @@ import java.util.UUID;
 
 @Data
 public class AssignResponse {
-    private UUID member;
+    private UUID memberId;
+    private String memberName;
+    private String role;
 }
