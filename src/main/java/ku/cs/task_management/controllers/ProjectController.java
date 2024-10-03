@@ -2,12 +2,17 @@ package ku.cs.task_management.controllers;
 
 import ku.cs.task_management.entities.Member;
 import ku.cs.task_management.entities.Project;
+import ku.cs.task_management.exceptions.NotFoundAssignmentException;
 import ku.cs.task_management.exceptions.NotFoundMemberException;
 import ku.cs.task_management.exceptions.NotFoundProjectException;
 import ku.cs.task_management.exceptions.NotProjectOwnerException;
 import ku.cs.task_management.repositories.MemberRepository;
+import ku.cs.task_management.requests.assignment_requests.AssignRequest;
 import ku.cs.task_management.requests.project_requests.ProjectRequest;
+import ku.cs.task_management.responses.AssignResponse;
 import ku.cs.task_management.responses.ProjectResponse;
+import ku.cs.task_management.responses.SuccessResponse;
+import ku.cs.task_management.services.AssignmentService;
 import ku.cs.task_management.services.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,6 +30,8 @@ public class ProjectController {
 
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private AssignmentService assignmentService;
 
     @GetMapping("/project/")
     public List<Project> getAllProjects() {
@@ -46,6 +53,24 @@ public class ProjectController {
     @PostMapping("/project/create")
     public ResponseEntity<ProjectResponse> createProject(@RequestBody ProjectRequest projectCreateRequest) throws NotFoundMemberException {
         return new ResponseEntity<>(projectService.createProject(projectCreateRequest), HttpStatus.CREATED);
+    }
+
+    // assignment GET
+    @GetMapping("/{projectId}/assignment")
+    public ResponseEntity<List<AssignResponse>> getAllMembersByProjectId(@PathVariable UUID projectId) throws NotFoundProjectException {
+        return new ResponseEntity<>(assignmentService.getAllMembersByProjectId(projectId), HttpStatus.OK);
+    }
+
+    // assignment POST
+    @PostMapping("/{projectId}/assign")
+    public ResponseEntity<SuccessResponse> assignMember(@PathVariable UUID projectId, @RequestBody AssignRequest request) throws NotFoundProjectException, NotFoundMemberException {
+        return new ResponseEntity<>(assignmentService.assign(projectId, request), HttpStatus.OK);
+    }
+
+    // assignment DELETE
+    @DeleteMapping("/{projectId}/unassign")
+    public ResponseEntity<SuccessResponse> unassignMember(@PathVariable UUID projectId, @RequestBody AssignRequest request) throws NotFoundProjectException, NotFoundMemberException, NotFoundAssignmentException {
+        return new ResponseEntity<>(assignmentService.unassign(projectId, request), HttpStatus.OK);
     }
 
     @PutMapping("/project/{email}/{projectId}/edit")

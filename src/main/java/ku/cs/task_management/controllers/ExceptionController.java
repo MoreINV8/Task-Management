@@ -121,4 +121,12 @@ public class ExceptionController {
 
         return new ResponseEntity<>(new ExceptionResponse(message, status), status);
     }
+
+    @ExceptionHandler(NotFoundAssignmentException.class)
+    public ResponseEntity<ExceptionResponse> notFoundAssignmentException(NotFoundAssignmentException e) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        String message = e.getMessage();
+
+        return new ResponseEntity<>(new ExceptionResponse(message, status), status);
+    }
 }

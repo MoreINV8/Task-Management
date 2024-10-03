@@ -3,6 +3,7 @@ package ku.cs.task_management.entities;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -30,11 +31,14 @@ public class Project {
     @JoinColumn(name = "member_fk", referencedColumnName = "member_id")
     private Member projectOwner;
 
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    private List<Assignment> projectMembers;
+
     @OneToMany(mappedBy = "taskProject", cascade = CascadeType.ALL)
-    private List<Task> ProjectTasks;
+    private List<Task> projectTasks;
 
     @OneToMany(mappedBy = "meetingProject", cascade = CascadeType.ALL)
-    private List<Meeting> ProjectMeetings;
+    private List<Meeting> projectMeetings;
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
     private List<Notification> projectNotifications;
