@@ -143,7 +143,7 @@ public class NotificationService {
 
         notificationRepository.delete(notification);
 
-        return new SuccessResponse("sucess full delete notification id '" + nId + "'", HttpStatus.ACCEPTED);
+        return new SuccessResponse("success full delete notification id '" + nId + "'", HttpStatus.ACCEPTED);
     }
 
     private NotificationResponse getResponse(Notification notification) {

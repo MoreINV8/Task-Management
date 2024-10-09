@@ -1,6 +1,7 @@
 package ku.cs.task_management.entities;
 
 import jakarta.persistence.*;
+import ku.cs.task_management.commons.ProjectStatus;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -26,6 +27,9 @@ public class Project {
 
     @Column(name = "project_deadline")
     private Date projectDeadline;
+
+    @Column(name = "project_fav")
+    private ProjectStatus projectFav;
 
     @ManyToOne
     @JoinColumn(name = "member_fk", referencedColumnName = "member_id")

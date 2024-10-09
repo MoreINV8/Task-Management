@@ -1,16 +1,21 @@
 package ku.cs.task_management.services;
 
+import ku.cs.task_management.commons.ProjectStatus;
 import ku.cs.task_management.entities.Member;
 import ku.cs.task_management.entities.Project;
+import ku.cs.task_management.exceptions.InvalidRequestException;
 import ku.cs.task_management.exceptions.NotFoundMemberException;
 import ku.cs.task_management.exceptions.NotFoundProjectException;
 import ku.cs.task_management.exceptions.NotProjectOwnerException;
 import ku.cs.task_management.repositories.MemberRepository;
 import ku.cs.task_management.repositories.ProjectRepository;
+import ku.cs.task_management.requests.project_requests.ProjectFavourRequest;
 import ku.cs.task_management.requests.project_requests.ProjectRequest;
 import ku.cs.task_management.responses.ProjectResponse;
+import ku.cs.task_management.responses.SuccessResponse;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -73,17 +78,16 @@ public class ProjectService {
         //TODO: need to recheck again about the exception
 
         Member member = memberRepository.findMemberByMemberId(request.getProjectOwnerId());
-        String email = member.getDetail().getMemberEmail();
-
-        if(!isAccountExist(member.getMemberId())) {
-            throw new NotFoundMemberException(email);
+        if(!isAccountExist(request.getProjectOwnerId())) {
+            throw new NotFoundMemberException(request.getProjectOwnerId().toString());
         }
+
         Project project = new Project();
 
         project.setProjectName(request.getProjectName());
         project.setProjectDescription(request.getProjectDescription());
         project.setProjectDeadline(request.getProjectDeadline());
-
+        project.setProjectFav(ProjectStatus.UNFAVOURED);
         project.setProjectOwner(member);
 
         Project createdProject = projectRepository.save(project);
@@ -131,6 +135,18 @@ public class ProjectService {
         }
 
         return modelMapper.map(project, ProjectResponse.class);
+    }
+
+    public SuccessResponse updateProjectFavour(ProjectFavourRequest request) throws NotFoundProjectException, InvalidRequestException {
+
+        Project project = projectRepository
+                .findById(request.getProjectId())
+                .orElseThrow(() -> new NotFoundProjectException(request.getProjectId()));
+
+        project.setProjectFav(request.getProjectFav());
+
+        projectRepository.save(project);
+        return new SuccessResponse("Update project Favour successful", HttpStatus.OK);
     }
 }
 

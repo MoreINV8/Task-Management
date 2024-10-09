@@ -2,12 +2,10 @@ package ku.cs.task_management.controllers;
 
 import ku.cs.task_management.entities.Member;
 import ku.cs.task_management.entities.Project;
-import ku.cs.task_management.exceptions.NotFoundAssignmentException;
-import ku.cs.task_management.exceptions.NotFoundMemberException;
-import ku.cs.task_management.exceptions.NotFoundProjectException;
-import ku.cs.task_management.exceptions.NotProjectOwnerException;
+import ku.cs.task_management.exceptions.*;
 import ku.cs.task_management.repositories.MemberRepository;
 import ku.cs.task_management.requests.assignment_requests.AssignRequest;
+import ku.cs.task_management.requests.project_requests.ProjectFavourRequest;
 import ku.cs.task_management.requests.project_requests.ProjectRequest;
 import ku.cs.task_management.responses.AssignResponse;
 import ku.cs.task_management.responses.ProjectResponse;
@@ -73,6 +71,10 @@ public class ProjectController {
         return new ResponseEntity<>(assignmentService.unassign(projectId, request), HttpStatus.OK);
     }
 
+    @PutMapping("/project/update-favour")
+    public ResponseEntity<SuccessResponse> updateFavour(@RequestBody ProjectFavourRequest request) throws NotFoundProjectException, InvalidRequestException {
+        return new ResponseEntity<>(projectService.updateProjectFavour(request), HttpStatus.OK);
+    }
     @PutMapping("/project/{email}/{projectId}/edit")
     public ResponseEntity<ProjectResponse> editProjectDetail(@PathVariable String email,
                                                              @PathVariable UUID projectId,
