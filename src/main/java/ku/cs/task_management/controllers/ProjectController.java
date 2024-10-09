@@ -1,10 +1,10 @@
 package ku.cs.task_management.controllers;
 
-import ku.cs.task_management.entities.Member;
 import ku.cs.task_management.entities.Project;
 import ku.cs.task_management.exceptions.*;
 import ku.cs.task_management.repositories.MemberRepository;
 import ku.cs.task_management.requests.assignment_requests.AssignRequest;
+import ku.cs.task_management.requests.assignment_requests.KickRequest;
 import ku.cs.task_management.requests.project_requests.ProjectFavourRequest;
 import ku.cs.task_management.requests.project_requests.ProjectRequest;
 import ku.cs.task_management.responses.AssignResponse;
@@ -67,7 +67,7 @@ public class ProjectController {
 
     // assignment DELETE
     @DeleteMapping("/{projectId}/unassign")
-    public ResponseEntity<SuccessResponse> unassignMember(@PathVariable UUID projectId, @RequestBody AssignRequest request) throws NotFoundProjectException, NotFoundMemberException, NotFoundAssignmentException {
+    public ResponseEntity<SuccessResponse> unassignMember(@PathVariable UUID projectId, @RequestBody KickRequest request) throws NotFoundProjectException, NotFoundMemberException, NotFoundAssignmentException {
         return new ResponseEntity<>(assignmentService.unassign(projectId, request), HttpStatus.OK);
     }
 

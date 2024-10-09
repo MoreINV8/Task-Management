@@ -11,6 +11,7 @@ import ku.cs.task_management.repositories.AssignmentRepository;
 import ku.cs.task_management.repositories.MemberRepository;
 import ku.cs.task_management.repositories.ProjectRepository;
 import ku.cs.task_management.requests.assignment_requests.AssignRequest;
+import ku.cs.task_management.requests.assignment_requests.KickRequest;
 import ku.cs.task_management.responses.AssignResponse;
 import ku.cs.task_management.responses.SuccessResponse;
 import org.modelmapper.ModelMapper;
@@ -57,23 +58,23 @@ public class AssignmentService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new NotFoundProjectException(projectId));
 
-        Member member = memberRepository.findMemberByMemberId(request.getMemberId());
+        Member member = memberRepository.findMemberByEmail(request.getEmail());
 
         if(member == null) {
-            throw new NotFoundMemberException(request.getMemberId().toString());
+            throw new NotFoundMemberException(request.getEmail());
         }
 
         Assignment assignment = new Assignment();
-        assignment.setId(new AssignmentKey(request.getMemberId(), projectId));
+        assignment.setId(new AssignmentKey(member.getMemberId(), projectId));
         assignment.setRole(request.getRole());
         assignment.setMember(member);
         assignment.setProject(project);
 
         assignmentRepository.save(assignment);
-        return new SuccessResponse(request.getMemberId() + " was added into " + projectId, HttpStatus.OK);
+        return new SuccessResponse(member.getMemberId() + " was added into " + projectId, HttpStatus.OK);
     }
 
-    public SuccessResponse unassign(UUID projectId, AssignRequest request) throws NotFoundProjectException, NotFoundMemberException, NotFoundAssignmentException {
+    public SuccessResponse unassign(UUID projectId, KickRequest request) throws NotFoundProjectException, NotFoundMemberException, NotFoundAssignmentException {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new NotFoundProjectException(projectId));
 
