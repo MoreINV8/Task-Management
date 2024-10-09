@@ -115,17 +115,13 @@ public class TaskService {
     }
 
     // Method to change task status
-    public TaskResponse changeTaskStatus(UUID taskId, int newStatus) throws NotFoundTaskException, InvalidRequestException {
+    public TaskResponse changeTaskStatus(UUID taskId, TaskStatus newStatus) throws NotFoundTaskException, InvalidRequestException {
 
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NotFoundTaskException(taskId));
 
-        switch (newStatus) {
-            case (0) -> task.setTaskStatus(TaskStatus.TODO);
-            case (1) -> task.setTaskStatus(TaskStatus.PROGRESS);
-            case (2) -> task.setTaskStatus(TaskStatus.DONE);
-            default -> throw new InvalidRequestException();
-        }
+        task.setTaskStatus(newStatus);
+
         taskRepository.save(task);
 
         TaskResponse taskResponse = modelMapper.map(task, TaskResponse.class);

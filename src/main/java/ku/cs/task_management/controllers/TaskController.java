@@ -52,7 +52,7 @@ public class TaskController {
     @PutMapping("/task/update-status")
     public ResponseEntity<TaskResponse> updateTaskStatus(@RequestParam UUID t, @RequestParam TaskStatus s)
             throws NotFoundTaskException, InvalidRequestException {
-        return new ResponseEntity<>(taskService.changeTaskStatus(t, s.ordinal()), HttpStatus.OK);
+        return new ResponseEntity<>(taskService.changeTaskStatus(t, s), HttpStatus.OK);
     }
 
     @DeleteMapping("/task/delete")
