@@ -32,9 +32,6 @@ public class Task {
     @OneToMany(mappedBy = "commentTask", cascade = CascadeType.ALL)
     private List<Comment> taskComments;
 
-    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "notificationTask", cascade = CascadeType.ALL)
     private List<Notification> taskNotifications;
-
-    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
-    private List<Log> taskLogs;
 }

@@ -26,17 +26,17 @@ public class Notification {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "project_id_fk")
-    private Project project;
+    private Project notificationProject;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "task_id_fk")
-    private Task task;
+    private Task notificationTask;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "meeting_id_fk")
-    private Meeting meeting;
+    private Meeting notificationMeeting;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "member_id_fk")
-    private Member receiver;
+    private Member notificationReceiver;
 }

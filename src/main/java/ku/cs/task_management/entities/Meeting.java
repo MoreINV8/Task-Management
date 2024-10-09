@@ -29,9 +29,6 @@ public class Meeting {
     @JoinColumn(name = "project_fk", referencedColumnName = "project_id")
     private Project meetingProject;
 
-    @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "notificationMeeting", cascade = CascadeType.ALL)
     private List<Notification> meetingNotifications;
-
-    @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL)
-    private List<Log> meetingLogs;
 }

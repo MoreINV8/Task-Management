@@ -3,6 +3,8 @@ package ku.cs.task_management.entities;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.sql.Date;
+
 @Data
 @Entity
 public class Log {
@@ -11,19 +13,17 @@ public class Log {
     @Column(name = "log_id")
     private int logId;
 
+    @Column(name = "log_action")
+    private String action;
+
+    @Column(name = "log_time")
+    private Date time;
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "project_id_fk")
     private Project project;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "task_id_fk")
-    private Task task;
-
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "meeting_id_fk")
-    private Meeting meeting;
-
-    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "member_id_fk")
-    private Member receiver;
+    private Member actor;
 }
