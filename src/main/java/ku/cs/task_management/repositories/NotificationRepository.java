@@ -13,7 +13,7 @@ import java.util.UUID;
 public interface NotificationRepository extends JpaRepository<Notification, UUID> {
 
     @Query(
-            value = "SELECT n FROM Notification n WHERE n.receiver.memberId = :id"
+            value = "SELECT n FROM Notification n WHERE n.notificationReceiver.memberId = :id"
     )
     public List<Notification> getNotificationsByReceiverId(@Param("id") UUID receiveId);
 }

@@ -14,7 +14,6 @@ import ku.cs.task_management.responses.SuccessResponse;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
@@ -76,12 +75,12 @@ public class NotificationService {
         LocalDate currentTime = LocalDate.now();
         notification.setNotificationTime(Date.valueOf(currentTime));
         notification.setNotificationStatus(NotificationStatus.UNREAD);
-        notification.setReceiver(memberRepository.findMemberByMemberId(request.getReceiverId()));
+        notification.setNotificationReceiver(memberRepository.findMemberByMemberId(request.getReceiverId()));
 
         switch (request.getType()) {
-            case (1) -> notification.setProject(projectRepository.getReferenceById(request.getProjectId()));
-            case (2) -> notification.setTask(taskRepository.getReferenceById(request.getTaskId()));
-            case (3) -> notification.setMeeting(meetingRepository.getReferenceById(request.getMeetingId()));
+            case (1) -> notification.setNotificationProject(projectRepository.getReferenceById(request.getProjectId()));
+            case (2) -> notification.setNotificationTask(taskRepository.getReferenceById(request.getTaskId()));
+            case (3) -> notification.setNotificationMeeting(meetingRepository.getReferenceById(request.getMeetingId()));
         }
 
         // get response
@@ -134,10 +133,10 @@ public class NotificationService {
         }
 
         Notification notification = notificationRepository.getReferenceById(notificationId);
-        notification.setProject(null);
-        notification.setTask(null);
-        notification.setMeeting(null);
-        notification.setReceiver(null);
+        notification.setNotificationProject(null);
+        notification.setNotificationTask(null);
+        notification.setNotificationMeeting(null);
+        notification.setNotificationReceiver(null);
 
         notificationRepository.save(notification);
 
@@ -150,20 +149,20 @@ public class NotificationService {
         // formatting response
         NotificationResponse response = modelMapper.map(notification, NotificationResponse.class);
 
-        response.setReceiverId(notification.getReceiver().getMemberId());
+        response.setReceiverId(notification.getNotificationReceiver().getMemberId());
 
         // TODO: ถ้าทำเสร็จแล้วอย่ากส่งเป็น object ออกไปเลยค่อยมาแก้
-        if (notification.getProject() != null) {
+        if (notification.getNotificationProject() != null) {
             response.setType(1);
-            response.setProjectId(notification.getProject().getProjectId());
+            response.setProjectId(notification.getNotificationProject().getProjectId());
         }
-        if (notification.getTask() != null) {
+        if (notification.getNotificationTask() != null) {
             response.setType(2);
-            response.setTaskId(notification.getTask().getTaskId());
+            response.setTaskId(notification.getNotificationTask().getTaskId());
         }
-        if (notification.getMeeting() != null) {
+        if (notification.getNotificationMeeting() != null) {
             response.setType(3);
-            response.setMeetingId(notification.getMeeting().getMeetingId());
+            response.setMeetingId(notification.getNotificationMeeting().getMeetingId());
         }
 
         return response;

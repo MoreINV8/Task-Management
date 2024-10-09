@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import ku.cs.task_management.commons.ProjectStatus;
 import lombok.Data;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -44,7 +43,7 @@ public class Project {
     @OneToMany(mappedBy = "meetingProject", cascade = CascadeType.ALL)
     private List<Meeting> projectMeetings;
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "notificationProject", cascade = CascadeType.ALL)
     private List<Notification> projectNotifications;
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
