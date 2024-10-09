@@ -11,6 +11,6 @@ public class TaskResponse {
     private UUID taskId;
     private String taskName;
     private String taskDetail;
-    private TaskStatus taskStat;
+    private TaskStatus taskStatus;
     private UUID taskProjectId;
 }

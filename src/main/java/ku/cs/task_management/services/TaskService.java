@@ -49,10 +49,8 @@ public class TaskService {
         task.setTaskStatus(TaskStatus.TODO);
 
         Task createdTask = taskRepository.save(task);
-        TaskResponse taskResponse = modelMapper.map(createdTask, TaskResponse.class);
-        taskResponse.setTaskStat(createdTask.getTaskStatus());
 
-        return taskResponse;
+        return modelMapper.map(createdTask, TaskResponse.class);
     }
 
     public List<TaskResponse> getAllTasksByProjectId(UUID projectId) throws NotFoundProjectException {
@@ -125,7 +123,7 @@ public class TaskService {
         taskRepository.save(task);
 
         TaskResponse taskResponse = modelMapper.map(task, TaskResponse.class);
-        taskResponse.setTaskStat(task.getTaskStatus());
+        taskResponse.setTaskStatus(task.getTaskStatus());
         return taskResponse;
     }
 }
