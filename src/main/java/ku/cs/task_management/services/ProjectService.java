@@ -70,16 +70,8 @@ public class ProjectService {
             throws NotFoundMemberException {
 
         //TODO: need to recheck again about the exception
-
-<<<<<<< HEAD
         Member member = memberRepository.findById(request.getProjectOwnerId())
                 .orElseThrow(() -> new NotFoundMemberException(request.getProjectOwnerId()));
-=======
-        Member member = memberRepository.findMemberByMemberId(request.getProjectOwnerId());
-        if(!isAccountExist(request.getProjectOwnerId())) {
-            throw new NotFoundMemberException(request.getProjectOwnerId().toString());
-        }
->>>>>>> 222771e1614f2ebb529bc9edaeec64ffcf71d07c
 
         Project project = new Project();
 

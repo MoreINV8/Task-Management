@@ -58,16 +58,11 @@ public class AssignmentService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new NotFoundProjectException(projectId));
 
-<<<<<<< HEAD
-        Member member = memberRepository.findById(request.getMemberId())
-                .orElseThrow(() -> new NotFoundMemberException(request.getMemberId()));
-=======
         Member member = memberRepository.findMemberByEmail(request.getEmail());
 
         if(member == null) {
             throw new NotFoundMemberException(request.getEmail());
         }
->>>>>>> 222771e1614f2ebb529bc9edaeec64ffcf71d07c
 
         Assignment assignment = new Assignment();
         assignment.setId(new AssignmentKey(member.getMemberId(), projectId));
