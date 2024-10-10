@@ -49,10 +49,9 @@ public class CommentService {
     public CommentResponse createComment(CommentRequest request) throws NotFoundTaskException, NotFoundMemberException {
         Comment comment = new Comment();
 
-        Member member = memberRepository.findMemberByMemberId(request.getCommentMemberId());
-        if (member == null) {
-            throw new NotFoundMemberException(request.getCommentMemberId().toString());
-        }
+        Member member = memberRepository.findById(request.getCommentMemberId())
+                .orElseThrow(() -> new NotFoundMemberException(request.getCommentMemberId()));
+
         // finding if task is exist then set.
         comment.setCommentTask(taskRepository
                 .findById(request.getCommentTaskId())

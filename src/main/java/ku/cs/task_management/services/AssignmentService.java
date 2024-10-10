@@ -57,11 +57,8 @@ public class AssignmentService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new NotFoundProjectException(projectId));
 
-        Member member = memberRepository.findMemberByMemberId(request.getMemberId());
-
-        if(member == null) {
-            throw new NotFoundMemberException(request.getMemberId().toString());
-        }
+        Member member = memberRepository.findById(request.getMemberId())
+                .orElseThrow(() -> new NotFoundMemberException(request.getMemberId()));
 
         Assignment assignment = new Assignment();
         assignment.setId(new AssignmentKey(request.getMemberId(), projectId));
@@ -77,11 +74,8 @@ public class AssignmentService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new NotFoundProjectException(projectId));
 
-        Member member = memberRepository.findMemberByMemberId(request.getMemberId());
-
-        if(member == null) {
-            throw new NotFoundMemberException(request.getMemberId().toString());
-        }
+        Member member = memberRepository.findById(request.getMemberId())
+                .orElseThrow(() -> new NotFoundMemberException(request.getMemberId()));
 
         AssignmentKey assignmentKey = new AssignmentKey(request.getMemberId(), projectId);
         Assignment assignment = assignmentRepository

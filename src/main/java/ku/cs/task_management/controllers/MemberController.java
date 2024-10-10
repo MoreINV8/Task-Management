@@ -1,9 +1,6 @@
 package ku.cs.task_management.controllers;
 
-import ku.cs.task_management.exceptions.NotFoundMemberException;
-import ku.cs.task_management.exceptions.SamePasswordException;
-import ku.cs.task_management.exceptions.UnavailableEmailException;
-import ku.cs.task_management.exceptions.WrongPasswordException;
+import ku.cs.task_management.exceptions.*;
 import ku.cs.task_management.requests.member_requests.MemberEditPasswordRequest;
 import ku.cs.task_management.requests.member_requests.MemberSignupRequest;
 import ku.cs.task_management.requests.member_requests.MemberLoginRequest;
@@ -15,6 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.UUID;
+
 @RestController
 public class MemberController {
 
@@ -24,11 +24,11 @@ public class MemberController {
     @PostMapping("/member/register")
     public ResponseEntity<MemberResponse> memberRegister(@RequestBody MemberSignupRequest request)
             throws UnavailableEmailException {
-        return new ResponseEntity<>(memberService.insertMember(request), HttpStatus.CREATED);
+        return new ResponseEntity<>(memberService.registerMember(request), HttpStatus.CREATED);
     }
 
     @PostMapping("/member/login")
-    public ResponseEntity<MemberResponse> testGetRequest(@RequestBody MemberLoginRequest request)
+    public ResponseEntity<MemberResponse> memberLogin(@RequestBody MemberLoginRequest request)
             throws NotFoundMemberException, WrongPasswordException {
         return new ResponseEntity<>(memberService.getLoginMember(request), HttpStatus.ACCEPTED);
     }
@@ -39,7 +39,7 @@ public class MemberController {
         return new ResponseEntity<>(memberService.updateMemberDetail(request), HttpStatus.ACCEPTED);
     }
 
-    @PutMapping("member/edit-password")
+    @PutMapping("/member/edit-password")
     public ResponseEntity<MemberResponse> editMemberPassword(@RequestBody MemberEditPasswordRequest request)
             throws NotFoundMemberException, WrongPasswordException, SamePasswordException {
         return new ResponseEntity<>(memberService.updateMemberPassword(request), HttpStatus.ACCEPTED);

@@ -1,9 +1,10 @@
 package ku.cs.task_management.entities;
 
 import jakarta.persistence.*;
+import ku.cs.task_management.commons.NotificationStatus;
 import lombok.Data;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
@@ -16,13 +17,13 @@ public class Notification {
     private UUID notificationId;
 
     @Column(name = "notification_time")
-    private Date notificationTime;
+    private LocalDateTime notificationTime;
 
     @Column(name = "notification_detail")
     private String notificationDetail;
 
     @Column(name = "notification_status")
-    private int notificationStatus;
+    private NotificationStatus notificationStatus;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "project_id_fk")

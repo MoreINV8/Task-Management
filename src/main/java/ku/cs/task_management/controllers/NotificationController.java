@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 public class NotificationController {
@@ -23,24 +24,24 @@ public class NotificationController {
 
     @PostMapping("/notification")
     public ResponseEntity<NotificationResponse> sendNotification(@RequestBody NotificationSendRequest request)
-            throws InvalidRequestException, InvalidNotificationTypeException, NotFoundMemberException {
+            throws InvalidRequestException, NotFoundMemberException {
         return new ResponseEntity<>(notificationService.insertNotification(request), HttpStatus.CREATED);
     }
 
     @GetMapping("/notification")
-    public ResponseEntity<List<NotificationResponse>> getNotificationsOfMember(@RequestParam String m)
+    public ResponseEntity<List<NotificationResponse>> getNotificationsOfMember(@RequestParam UUID m)
             throws NotFoundMemberException, IllegalArgumentException {
         return ResponseEntity.ok(notificationService.getNotificationFromMemberId(m));
     }
 
     @PutMapping("/notification")
-    public ResponseEntity<NotificationResponse> readNotification(@RequestParam String n)
+    public ResponseEntity<NotificationResponse> readNotification(@RequestParam UUID n)
             throws NotFoundNotificationException, IllegalArgumentException {
         return new ResponseEntity<>(notificationService.readNotification(n), HttpStatus.ACCEPTED);
     }
 
     @DeleteMapping("/notification")
-    public ResponseEntity<SuccessResponse> deleteNotification(@RequestParam String n)
+    public ResponseEntity<SuccessResponse> deleteNotification(@RequestParam UUID n)
             throws NotFoundNotificationException, IllegalArgumentException {
         return new ResponseEntity<>(notificationService.deleteNotification(n), HttpStatus.ACCEPTED);
     }

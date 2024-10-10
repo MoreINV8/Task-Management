@@ -32,17 +32,11 @@ public class ProjectService {
     public List<Project> getAllProjects() {
         return projectRepository.findAll();
     }
-    // check if member is existed by his id.
-    public boolean isAccountExist(UUID memberId) {
-        return memberRepository.findMemberByMemberId(memberId) != null;
-    }
 
     public List<ProjectResponse> getAllProjectsByOwnerId(UUID memberId) throws NotFoundMemberException {
 
-        Member member = memberRepository.findMemberByMemberId(memberId);
-        if (!isAccountExist(member.getMemberId())){
-            throw new NotFoundMemberException(member.getDetail().getMemberEmail());
-        }
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new NotFoundMemberException(memberId));
 
         return getProjectsForMember(member);
     }
@@ -50,7 +44,7 @@ public class ProjectService {
     public List<ProjectResponse> getAllProjectsByOwnerEmail(String email) throws NotFoundMemberException {
 
         Member member = memberRepository.findMemberByEmail(email);
-        if (!isAccountExist(member.getMemberId())){
+        if (member == null){
             throw new NotFoundMemberException(email);
         }
 
@@ -72,12 +66,9 @@ public class ProjectService {
 
         //TODO: need to recheck again about the exception
 
-        Member member = memberRepository.findMemberByMemberId(request.getProjectOwnerId());
-        String email = member.getDetail().getMemberEmail();
+        Member member = memberRepository.findById(request.getProjectOwnerId())
+                .orElseThrow(() -> new NotFoundMemberException(request.getProjectOwnerId()));
 
-        if(!isAccountExist(member.getMemberId())) {
-            throw new NotFoundMemberException(email);
-        }
         Project project = new Project();
 
         project.setProjectName(request.getProjectName());

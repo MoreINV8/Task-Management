@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -15,11 +16,4 @@ public interface MemberRepository extends JpaRepository<Member, UUID> {
             value = "SELECT m FROM Member m WHERE m.detail.memberEmail = :email"
     )
     Member findMemberByEmail(@Param("email") String email);
-
-    Member findMemberByMemberId(UUID memberId);
-
-    @Query(
-            value = "SELECT m.detail.memberEmail FROM Member m WHERE m.memberId = :id"
-    )
-    String findMemberEmailByMemberId(@Param("id") UUID memberId);
 }

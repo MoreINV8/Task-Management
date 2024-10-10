@@ -1,7 +1,8 @@
 package ku.cs.task_management.services;
 
-import ku.cs.task_management.configs.NotificationStatus;
-import ku.cs.task_management.configs.NotificationType;
+import ku.cs.task_management.commons.NotificationStatus;
+import ku.cs.task_management.commons.NotificationType;
+import ku.cs.task_management.entities.Member;
 import ku.cs.task_management.entities.Notification;
 import ku.cs.task_management.exceptions.InvalidNotificationTypeException;
 import ku.cs.task_management.exceptions.InvalidRequestException;
@@ -16,8 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -44,95 +44,75 @@ public class NotificationService {
     private ModelMapper modelMapper;
 
     public NotificationResponse insertNotification(NotificationSendRequest request)
-            throws NotFoundMemberException, InvalidNotificationTypeException, InvalidRequestException {
+            throws NotFoundMemberException, InvalidRequestException {
+
         // check if member account was existed
-        if (memberRepository.findMemberByMemberId(request.getReceiverId()) == null) {
-            throw new NotFoundMemberException(memberRepository.findMemberEmailByMemberId(request.getReceiverId()));
-        }
-
-        // check if request type is valid
-        if (request.getType() < NotificationType.PROJECT
-                && request.getType() > NotificationType.MEETING) {
-            throw new InvalidNotificationTypeException();
-        }
-
-        // check if id of project, task, meeting once is not null
-        if (request.getType() == 1 && request.getProjectId() == null) {
-            throw new InvalidRequestException();
-        }
-        if (request.getType() == 2 && request.getTaskId() == null) {
-            throw new InvalidRequestException();
-        }
-        if (request.getType() == 3 && request.getMeetingId() == null) {
-            throw new InvalidRequestException();
-        }
+        Member receiver = memberRepository.findById(request.getReceiverId())
+                .orElseThrow(() -> new NotFoundMemberException(request.getReceiverId()));
 
         // retrieve data from request
         Notification notification = new Notification();
+
+        // check type
+        switch (request.isTypeMatch()) {
+            case (0) -> notification.setNotificationProject(projectRepository.getReferenceById(request.getProjectId()));
+            case (1) -> notification.setNotificationTask(taskRepository.getReferenceById(request.getTaskId()));
+            case (2) -> notification.setNotificationMeeting(meetingRepository.getReferenceById(request.getMeetingId()));
+            default -> throw new InvalidRequestException();
+        }
+
         notification.setNotificationDetail(request.getNotificationDetail());
 
         // set value
-        LocalDate currentTime = LocalDate.now();
-        notification.setNotificationTime(Date.valueOf(currentTime));
+        notification.setNotificationTime(LocalDateTime.now());
         notification.setNotificationStatus(NotificationStatus.UNREAD);
-        notification.setNotificationReceiver(memberRepository.findMemberByMemberId(request.getReceiverId()));
-
-        switch (request.getType()) {
-            case (1) -> notification.setNotificationProject(projectRepository.getReferenceById(request.getProjectId()));
-            case (2) -> notification.setNotificationTask(taskRepository.getReferenceById(request.getTaskId()));
-            case (3) -> notification.setNotificationMeeting(meetingRepository.getReferenceById(request.getMeetingId()));
-        }
+        notification.setNotificationReceiver(receiver);
 
         // get response
         return getResponse(notificationRepository.save(notification));
     }
 
-    public List<NotificationResponse> getNotificationFromMemberId(String mId)
+    public List<NotificationResponse> getNotificationFromMemberId(UUID mId)
             throws NotFoundMemberException, IllegalArgumentException {
-        // convert string to uuid
-        UUID receiverId = UUID.fromString(mId);
 
         // check if member account existed
-        if (memberRepository.findMemberByMemberId(receiverId) == null) {
-            throw new NotFoundMemberException(memberRepository.findMemberEmailByMemberId(receiverId));
+        if (!memberRepository.existsById(mId)) {
+            throw new NotFoundMemberException(mId);
         }
 
         // retrieve notifications of this member
         List<NotificationResponse> notifications = new ArrayList<>();
-        for (Notification notification : notificationRepository.getNotificationsByReceiverId(receiverId)) {
+        for (Notification notification : notificationRepository.getNotificationsByReceiverId(mId)) {
             notifications.add(getResponse(notification));
         }
 
         return notifications;
     }
 
-    public NotificationResponse readNotification(String nId)
+    public NotificationResponse readNotification(UUID nId)
             throws NotFoundNotificationException, IllegalArgumentException {
-        // convert string to uuid
-        UUID notificationId = UUID.fromString(nId);
 
         // check if notification existed
-        if (!notificationRepository.existsById(notificationId)) {
+        if (!notificationRepository.existsById(nId)) {
             throw new NotFoundNotificationException(nId);
         }
 
         // set notification status to read
-        Notification notification = notificationRepository.getReferenceById(notificationId);
+        Notification notification = notificationRepository.findById(nId).get();
         notification.setNotificationStatus(NotificationStatus.READ);
 
         // save notification to database
         return getResponse(notificationRepository.save(notification));
     }
 
-    public SuccessResponse deleteNotification(String nId)
+    public SuccessResponse deleteNotification(UUID nId)
             throws NotFoundNotificationException, IllegalArgumentException {
-        UUID notificationId = UUID.fromString(nId);
 
-        if (!notificationRepository.existsById(notificationId)) {
+        if (!notificationRepository.existsById(nId)) {
             throw new NotFoundNotificationException(nId);
         }
 
-        Notification notification = notificationRepository.getReferenceById(notificationId);
+        Notification notification = notificationRepository.getReferenceById(nId);
         notification.setNotificationProject(null);
         notification.setNotificationTask(null);
         notification.setNotificationMeeting(null);
@@ -142,7 +122,7 @@ public class NotificationService {
 
         notificationRepository.delete(notification);
 
-        return new SuccessResponse("sucess full delete notification id '" + nId + "'", HttpStatus.ACCEPTED);
+        return new SuccessResponse("success full delete notification id '" + nId + "'", HttpStatus.ACCEPTED);
     }
 
     private NotificationResponse getResponse(Notification notification) {
@@ -153,15 +133,15 @@ public class NotificationService {
 
         // TODO: ถ้าทำเสร็จแล้วอย่ากส่งเป็น object ออกไปเลยค่อยมาแก้
         if (notification.getNotificationProject() != null) {
-            response.setType(1);
+            response.setType(NotificationType.PROJECT);
             response.setProjectId(notification.getNotificationProject().getProjectId());
         }
         if (notification.getNotificationTask() != null) {
-            response.setType(2);
+            response.setType(NotificationType.TASK);
             response.setTaskId(notification.getNotificationTask().getTaskId());
         }
         if (notification.getNotificationMeeting() != null) {
-            response.setType(3);
+            response.setType(NotificationType.MEETING);
             response.setMeetingId(notification.getNotificationMeeting().getMeetingId());
         }
 

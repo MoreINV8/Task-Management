@@ -2,12 +2,11 @@ package ku.cs.task_management.services;
 
 import ku.cs.task_management.entities.Member;
 import ku.cs.task_management.entities.MemberDetail;
-import ku.cs.task_management.exceptions.NotFoundMemberException;
-import ku.cs.task_management.exceptions.SamePasswordException;
-import ku.cs.task_management.exceptions.UnavailableEmailException;
-import ku.cs.task_management.exceptions.WrongPasswordException;
+import ku.cs.task_management.entities.Project;
+import ku.cs.task_management.exceptions.*;
 import ku.cs.task_management.repositories.MemberDetailRepository;
 import ku.cs.task_management.repositories.MemberRepository;
+import ku.cs.task_management.repositories.ProjectRepository;
 import ku.cs.task_management.requests.member_requests.MemberEditPasswordRequest;
 import ku.cs.task_management.requests.member_requests.MemberSignupRequest;
 import ku.cs.task_management.requests.member_requests.MemberLoginRequest;
@@ -18,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -33,45 +34,35 @@ public class MemberService {
     private MemberRepository memberRepository;
 
     @Autowired
+    private ProjectRepository projectRepository;
+
+    @Autowired
     private MemberDetailRepository memberDetailRepository;
 
-    public boolean isAccountExist(UUID memberId) {
-        return memberRepository.findMemberByMemberId(memberId) != null;
-    }
-
-    public boolean isAccountExist(String memberEmail) {
-        return memberRepository.findMemberByEmail(memberEmail) != null;
-    }
-
-    public boolean isMatchPassword(String email, String password) {
-        MemberDetail memberDetail = memberDetailRepository.findMemberDetailByMemberEmail(email);
-
-        return passwordEncoder.matches(password, memberDetail.getMemberPassword());
-    }
-
-    public String getMemberEmailById(UUID id) {
-        return memberRepository.findMemberEmailByMemberId(id);
+    public boolean isMatchPassword(Member member, String password) {
+        return passwordEncoder.matches(password, member.getDetail().getMemberPassword());
     }
 
     public MemberResponse getLoginMember(MemberLoginRequest request)
             throws NotFoundMemberException, WrongPasswordException {
         // check user was existed
-        if (!isAccountExist(request.getMemberEmail())) {
+        Member member = memberRepository.findMemberByEmail(request.getMemberEmail());
+        if (member == null) {
             throw new NotFoundMemberException(request.getMemberEmail());
         }
 
         // check password
-        if (!isMatchPassword(request.getMemberEmail(), request.getMemberPassword())) {
+        if (!isMatchPassword(member, request.getMemberPassword())) {
             throw new WrongPasswordException();
         }
 
-        return modelMapper.map(memberRepository.findMemberByEmail(request.getMemberEmail()), MemberResponse.class);
+        return modelMapper.map(member, MemberResponse.class);
     }
 
-    public MemberResponse insertMember(MemberSignupRequest request)
+    public MemberResponse registerMember(MemberSignupRequest request)
             throws UnavailableEmailException {
         // check if email was used
-        if (isAccountExist(request.getMemberEmail())) {
+        if (memberRepository.findMemberByEmail(request.getMemberEmail()) != null) {
             throw new UnavailableEmailException(request.getMemberEmail());
         }
 
@@ -92,19 +83,17 @@ public class MemberService {
     public MemberResponse updateMemberDetail(MemberEditProfileRequest request)
             throws UnavailableEmailException, NotFoundMemberException {
         // check if member account excise
-        if (!isAccountExist(request.getMemberId())) {
-            throw new NotFoundMemberException(request.getDetail().getMemberEmail());
-        }
+        Member member = memberRepository.findById(request.getMemberId())
+                .orElseThrow(() -> new NotFoundMemberException(request.getMemberId()));
 
         // retrieve member account
-        Member member = memberRepository.findMemberByMemberId(request.getMemberId());
         String oldEmail = null;
 
         // delete old table in case change email
         if (!member.getDetail().getMemberEmail().equals(request.getDetail().getMemberEmail())) {
 
             // check to not have copy email
-            if (isAccountExist(request.getDetail().getMemberEmail())) {
+            if (memberRepository.findMemberByEmail(request.getDetail().getMemberEmail()) != null) {
                 throw new UnavailableEmailException(request.getDetail().getMemberEmail());
             }
 
@@ -127,16 +116,13 @@ public class MemberService {
 
     public MemberResponse updateMemberPassword(MemberEditPasswordRequest request)
             throws SamePasswordException, NotFoundMemberException, WrongPasswordException {
-        // retrieve email
-        String email = getMemberEmailById(request.getMemberId());
 
         // check if member account were existed
-        if (!isAccountExist(request.getMemberId())) {
-            throw new NotFoundMemberException(email);
-        }
+        Member member = memberRepository.findById(request.getMemberId())
+                .orElseThrow(() -> new NotFoundMemberException(request.getMemberId()));
 
         // check if password is correct
-        if (!isMatchPassword(email, request.getCurrentPassword())) {
+        if (!isMatchPassword(member, request.getCurrentPassword())) {
             throw new WrongPasswordException();
         }
 
@@ -149,7 +135,6 @@ public class MemberService {
         String encodedPassword = passwordEncoder.encode(request.getNewPassword());
 
         // retrieve member data and replace password
-        Member member = memberRepository.findMemberByMemberId(request.getMemberId());
         member.getDetail().setMemberPassword(encodedPassword);
 
         // save updated password

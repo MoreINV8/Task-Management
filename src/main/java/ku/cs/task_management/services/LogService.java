@@ -1,6 +1,8 @@
 package ku.cs.task_management.services;
 
 import ku.cs.task_management.entities.Log;
+import ku.cs.task_management.entities.Member;
+import ku.cs.task_management.entities.Project;
 import ku.cs.task_management.exceptions.NotFoundMemberException;
 import ku.cs.task_management.exceptions.NotFoundProjectException;
 import ku.cs.task_management.repositories.LogRepository;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -32,20 +35,18 @@ public class LogService {
     public LogResponse saveLog(LogRequest request)
             throws NotFoundMemberException, NotFoundProjectException {
         // not found the actor
-        if (memberRepository.findMemberByMemberId(request.getLogActor()) == null){
-            throw new NotFoundMemberException(request.getLogAction().toString());
-        }
+        Member actor = memberRepository.findById(request.getLogActor())
+                .orElseThrow(() -> new NotFoundMemberException(request.getLogActor()));
 
         // not found the project
-        if (!projectRepository.existsById(request.getLogProject())) {
-            throw new NotFoundProjectException(request.getLogProject());
-        }
+        Project project = projectRepository.findById(request.getLogProject())
+                .orElseThrow(() -> new NotFoundProjectException(request.getLogProject()));
 
         Log logRequest = new Log();
         logRequest.setAction(request.getLogAction());
-        logRequest.setTime(Date.valueOf(LocalDate.now()));
-        logRequest.setActor(memberRepository.findMemberByMemberId(request.getLogActor()));
-        logRequest.setProject(projectRepository.getReferenceById(request.getLogProject()));
+        logRequest.setTime(LocalDateTime.now());
+        logRequest.setActor(actor);
+        logRequest.setProject(project);
 
         return getResponse(logRepository.save(logRequest));
     }

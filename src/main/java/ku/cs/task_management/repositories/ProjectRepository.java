@@ -1,5 +1,6 @@
 package ku.cs.task_management.repositories;
 
+import ku.cs.task_management.entities.Member;
 import ku.cs.task_management.entities.Project;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

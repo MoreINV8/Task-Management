@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -17,7 +18,7 @@ public class Log {
     private String action;
 
     @Column(name = "log_time")
-    private Date time;
+    private LocalDateTime time;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "project_id_fk")
