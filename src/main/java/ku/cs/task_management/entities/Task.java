@@ -1,6 +1,7 @@
 package ku.cs.task_management.entities;
 
 import jakarta.persistence.*;
+import ku.cs.task_management.commons.TaskStatus;
 import lombok.Data;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public class Task {
     private String taskDetail;
 
     @Column(name = "task_status")
-    private int taskStatus;
+    private TaskStatus taskStatus;
 
     @ManyToOne
     @JoinColumn(name = "project_fk", referencedColumnName = "project_id")

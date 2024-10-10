@@ -1,8 +1,9 @@
 package ku.cs.task_management.services;
 
-import ku.cs.task_management.configs.TaskStatus;
+import ku.cs.task_management.commons.TaskStatus;
 import ku.cs.task_management.entities.Project;
 import ku.cs.task_management.entities.Task;
+import ku.cs.task_management.exceptions.InvalidRequestException;
 import ku.cs.task_management.exceptions.NotFoundProjectException;
 import ku.cs.task_management.exceptions.NotFoundTaskException;
 import ku.cs.task_management.repositories.ProjectRepository;
@@ -48,6 +49,7 @@ public class TaskService {
         task.setTaskStatus(TaskStatus.TODO);
 
         Task createdTask = taskRepository.save(task);
+
         return modelMapper.map(createdTask, TaskResponse.class);
     }
 
@@ -111,14 +113,17 @@ public class TaskService {
     }
 
     // Method to change task status
-    public TaskResponse changeTaskStatus(UUID taskId, int newStatus) throws NotFoundTaskException {
+    public TaskResponse changeTaskStatus(UUID taskId, TaskStatus newStatus) throws NotFoundTaskException, InvalidRequestException {
 
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NotFoundTaskException(taskId));
 
         task.setTaskStatus(newStatus);
+
         taskRepository.save(task);
 
-        return modelMapper.map(task, TaskResponse.class);
+        TaskResponse taskResponse = modelMapper.map(task, TaskResponse.class);
+        taskResponse.setTaskStatus(task.getTaskStatus());
+        return taskResponse;
     }
 }

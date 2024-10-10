@@ -1,5 +1,6 @@
 package ku.cs.task_management.responses;
 
+import ku.cs.task_management.commons.ProjectStatus;
 import ku.cs.task_management.entities.Member;
 import lombok.Data;
 
@@ -12,5 +13,6 @@ public class ProjectResponse {
     private String projectName;
     private String projectDescription;
     private Date projectDeadline;
+    private ProjectStatus projectFav;
     private UUID projectOwnerId;
 }

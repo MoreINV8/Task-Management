@@ -1,5 +1,7 @@
 package ku.cs.task_management.controllers;
 
+import ku.cs.task_management.commons.TaskStatus;
+import ku.cs.task_management.exceptions.InvalidRequestException;
 import ku.cs.task_management.exceptions.NotFoundProjectException;
 import ku.cs.task_management.exceptions.NotFoundTaskException;
 import ku.cs.task_management.requests.task_requests.TaskCreateRequest;
@@ -25,38 +27,37 @@ public class TaskController {
         return taskService.getAllTasks();
     }
 
-    @GetMapping("/{projectId}/task")
-    public ResponseEntity<List<TaskResponse>> getAllTasksByProjectId(@PathVariable UUID projectId) throws NotFoundProjectException {
-        return new ResponseEntity<>(taskService.getAllTasksByProjectId(projectId), HttpStatus.OK);
+    @GetMapping("/all-task")
+    public ResponseEntity<List<TaskResponse>> getAllTasksByProjectId(@RequestParam UUID p) throws NotFoundProjectException {
+        return new ResponseEntity<>(taskService.getAllTasksByProjectId(p), HttpStatus.OK);
     }
 
-    @GetMapping("{projectId}/task/{taskId}")
-    public ResponseEntity<TaskResponse> getTaskDetail(@PathVariable UUID projectId, @PathVariable UUID taskId)
+    @GetMapping("/task/detail")
+    public ResponseEntity<TaskResponse> getTaskDetail(@RequestParam UUID p, @RequestParam UUID t)
             throws NotFoundProjectException, NotFoundTaskException {
-        return new ResponseEntity<>(taskService.getTaskDetail(projectId, taskId), HttpStatus.OK);
+        return new ResponseEntity<>(taskService.getTaskDetail(p, t), HttpStatus.OK);
     }
-    @PostMapping("/{projectId}/task")
+    @PostMapping("/task/create")
     public ResponseEntity<TaskResponse> createTask(@RequestBody TaskCreateRequest request)
         throws NotFoundProjectException {
         return new ResponseEntity<>(taskService.createTask(request), HttpStatus.CREATED);
     }
 
-    @PutMapping("/{projectId}/task")
+    @PutMapping("/task/update")
     public ResponseEntity<TaskResponse> updateTaskDetail(@RequestBody TaskUpdateRequest request)
             throws NotFoundProjectException, NotFoundTaskException {
         return new ResponseEntity<>(taskService.updateTaskDetail(request), HttpStatus.OK);
     }
 
-    // TODO: how we get the status to change, check it again later
-    @PutMapping("/{projectId}/{taskId}/status")
-    public ResponseEntity<TaskResponse> updateTaskStatus(@PathVariable UUID taskId, @RequestParam int status)
-            throws NotFoundTaskException {
-        return new ResponseEntity<>(taskService.changeTaskStatus(taskId, status), HttpStatus.OK);
+    @PutMapping("/task/update-status")
+    public ResponseEntity<TaskResponse> updateTaskStatus(@RequestParam UUID t, @RequestParam TaskStatus s)
+            throws NotFoundTaskException, InvalidRequestException {
+        return new ResponseEntity<>(taskService.changeTaskStatus(t, s), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{projectId}/{taskId}")
-    public ResponseEntity<TaskResponse> deleteTask(@PathVariable UUID projectId, @PathVariable UUID taskId)
+    @DeleteMapping("/task/delete")
+    public ResponseEntity<TaskResponse> deleteTask(@RequestParam UUID p, @RequestParam UUID t)
             throws NotFoundProjectException, NotFoundTaskException {
-        return new ResponseEntity<>(taskService.deleteTask(projectId, taskId), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(taskService.deleteTask(p, t), HttpStatus.NO_CONTENT);
     }
 }
