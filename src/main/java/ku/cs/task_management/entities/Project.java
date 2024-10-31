@@ -27,6 +27,9 @@ public class Project {
     @Column(name = "project_deadline")
     private Date projectDeadline;
 
+    @Column(name = "project_img")
+    private String projectImg;
+
     @Column(name = "project_fav")
     private ProjectStatus projectFav;
 

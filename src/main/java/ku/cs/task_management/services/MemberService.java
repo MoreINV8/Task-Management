@@ -65,7 +65,7 @@ public class MemberService {
         if (memberRepository.findMemberByEmail(request.getMemberEmail()) != null) {
             throw new UnavailableEmailException(request.getMemberEmail());
         }
-
+        System.out.println(request);
         // mapping request with entity class
         Member requestMember = new Member();
         requestMember.setDetail(modelMapper.map(request, MemberDetail.class));

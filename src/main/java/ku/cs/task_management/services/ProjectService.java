@@ -80,6 +80,8 @@ public class ProjectService {
         project.setProjectDeadline(request.getProjectDeadline());
         project.setProjectFav(ProjectStatus.UNFAVOURED);
         project.setProjectOwner(member);
+        // TODO: default
+        project.setProjectImg("?");
 
         Project createdProject = projectRepository.save(project);
         return modelMapper.map(createdProject, ProjectResponse.class);
@@ -104,6 +106,7 @@ public class ProjectService {
         project.setProjectName(request.getProjectName());
         project.setProjectDescription(request.getProjectDescription());
         project.setProjectDeadline(request.getProjectDeadline());
+        project.setProjectImg(request.getProjectImg());
 
         Project updatedProject = projectRepository.save(project);
         return modelMapper.map(updatedProject, ProjectResponse.class);

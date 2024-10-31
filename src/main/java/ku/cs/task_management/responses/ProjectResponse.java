@@ -15,4 +15,5 @@ public class ProjectResponse {
     private Date projectDeadline;
     private ProjectStatus projectFav;
     private UUID projectOwnerId;
+    private String projectImg;
 }

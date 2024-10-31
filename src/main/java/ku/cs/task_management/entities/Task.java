@@ -1,5 +1,6 @@
 package ku.cs.task_management.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import ku.cs.task_management.commons.TaskStatus;
 import lombok.Data;
@@ -26,6 +27,7 @@ public class Task {
     @Column(name = "task_status")
     private TaskStatus taskStatus;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "project_fk", referencedColumnName = "project_id")
     private Project taskProject;

@@ -12,4 +12,5 @@ public class ProjectRequest {
     private String projectDescription;
     private Date projectDeadline;
     private UUID projectOwnerId;
+    private String projectImg;
 }
