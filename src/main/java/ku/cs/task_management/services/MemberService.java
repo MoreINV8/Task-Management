@@ -14,6 +14,11 @@ import ku.cs.task_management.requests.member_requests.edit_profile.MemberEditPro
 import ku.cs.task_management.responses.MemberResponse;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +27,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class MemberService {
+public class MemberService implements UserDetailsService {
 
     @Autowired
     private ModelMapper modelMapper;
@@ -38,6 +43,9 @@ public class MemberService {
 
     @Autowired
     private MemberDetailRepository memberDetailRepository;
+
+    @Autowired
+    private JWTService jwtService;
 
     public boolean isMatchPassword(Member member, String password) {
         return passwordEncoder.matches(password, member.getDetail().getMemberPassword());
@@ -56,7 +64,10 @@ public class MemberService {
             throw new WrongPasswordException();
         }
 
-        return modelMapper.map(member, MemberResponse.class);
+        MemberResponse response = modelMapper.map(member, MemberResponse.class);
+        response.setToken(jwtService.generateToken(member));
+
+        return response;
     }
 
     public MemberResponse registerMember(MemberSignupRequest request)
@@ -139,5 +150,20 @@ public class MemberService {
 
         // save updated password
         return modelMapper.map(memberRepository.save(member), MemberResponse.class);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+
+        Member member = memberRepository.findMemberByEmail(email);
+
+        if (member == null) {
+            throw new UsernameNotFoundException("not found user");
+        }
+
+        List<SimpleGrantedAuthority> auth = new ArrayList<>();
+        auth.add(new SimpleGrantedAuthority(member.getMemberId().toString()));
+
+        return new User(member.getDetail().getMemberEmail(), member.getDetail().getMemberPassword(), auth);
     }
 }
