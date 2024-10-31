@@ -18,18 +18,6 @@ public class MemberController {
     @Autowired
     private MemberService memberService;
 
-    @PostMapping("/member/register")
-    public ResponseEntity<MemberResponse> memberRegister(@RequestBody MemberSignupRequest request)
-            throws UnavailableEmailException {
-        return new ResponseEntity<>(memberService.registerMember(request), HttpStatus.CREATED);
-    }
-
-    @PostMapping("/member/login")
-    public ResponseEntity<MemberResponse> memberLogin(@RequestBody MemberLoginRequest request)
-            throws NotFoundMemberException, WrongPasswordException {
-        return new ResponseEntity<>(memberService.getLoginMember(request), HttpStatus.ACCEPTED);
-    }
-
     @PutMapping("/member/edit-profile")
     public ResponseEntity<MemberResponse> editMemberProfile(@RequestBody MemberEditProfileRequest request)
             throws NotFoundMemberException, UnavailableEmailException {

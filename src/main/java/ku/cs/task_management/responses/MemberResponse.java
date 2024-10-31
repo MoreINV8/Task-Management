@@ -6,6 +6,7 @@ import java.util.UUID;
 
 @Data
 public class MemberResponse {
+    private String token;
     private UUID memberId;
     private MemberDetailResponse detail;
 }
