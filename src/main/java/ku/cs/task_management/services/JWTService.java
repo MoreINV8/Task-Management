@@ -28,7 +28,7 @@ public class JWTService {
                 .add(claims)
                 .subject(member.getDetail().getMemberEmail())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + (1000 * 60 * 5))) // change to second * 1 minuit * numbers of minuit
+                .expiration(new Date(System.currentTimeMillis() + (1000 * 60 * 60))) // change to second * 1 minuit * numbers of minuit
                 .and()
                 .signWith(Keys.hmacShaKeyFor(jwtSecretKey.getBytes()))
                 .compact();
