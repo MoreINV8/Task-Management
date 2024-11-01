@@ -70,6 +70,14 @@ public class MemberService implements UserDetailsService {
         return response;
     }
 
+    public MemberResponse getMemberById(UUID memberId) throws NotFoundMemberException {
+        if (!memberRepository.existsById(memberId)) {
+            throw new NotFoundMemberException(memberId);
+        }
+
+        return modelMapper.map(memberRepository.findById(memberId), MemberResponse.class);
+    }
+
     public MemberResponse registerMember(MemberSignupRequest request)
             throws UnavailableEmailException {
         // check if email was used

@@ -10,11 +10,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 public class MemberController {
 
     @Autowired
     private MemberService memberService;
+
+    @GetMapping("/member")
+    public ResponseEntity<MemberResponse> getMemberById(@RequestParam UUID m) throws NotFoundMemberException {
+        return ResponseEntity.ok(memberService.getMemberById(m));
+    }
 
     @PutMapping("/member/edit-profile")
     public ResponseEntity<MemberResponse> editMemberProfile(@RequestBody MemberEditProfileRequest request)

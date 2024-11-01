@@ -11,4 +11,5 @@ import java.util.UUID;
 @Repository
 public interface AssignmentRepository extends JpaRepository<Assignment, AssignmentKey> {
     List<Assignment> findAllByProjectProjectId(UUID projectId);
+    List<Assignment> findAllByMemberMemberId(UUID memberId);
 }

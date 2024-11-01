@@ -13,6 +13,7 @@ import ku.cs.task_management.repositories.ProjectRepository;
 import ku.cs.task_management.requests.assignment_requests.AssignRequest;
 import ku.cs.task_management.requests.assignment_requests.KickRequest;
 import ku.cs.task_management.responses.AssignResponse;
+import ku.cs.task_management.responses.ProjectResponse;
 import ku.cs.task_management.responses.SuccessResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -51,6 +52,17 @@ public class AssignmentService {
         }
         return responses;
     }
+
+    public List<ProjectResponse> getAllProjectByMemberId(UUID memberId) {
+        List<ProjectResponse> responses = new ArrayList<>();
+
+        for (Assignment assignment:assignmentRepository.findAllByMemberMemberId(memberId)) {
+            responses.add(new ProjectResponse(assignment.getProject()));
+        }
+
+        return responses;
+    }
+
     public SuccessResponse assign(UUID projectId, AssignRequest request) throws NotFoundProjectException, NotFoundMemberException {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new NotFoundProjectException(projectId));
