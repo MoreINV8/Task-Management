@@ -1,11 +1,17 @@
 package ku.cs.task_management.services;
 
 import ku.cs.task_management.commons.TaskStatus;
+import ku.cs.task_management.entities.Member;
+import ku.cs.task_management.entities.Participation;
 import ku.cs.task_management.entities.Project;
 import ku.cs.task_management.entities.Task;
+import ku.cs.task_management.entities.keys.ParticipationKey;
 import ku.cs.task_management.exceptions.InvalidRequestException;
+import ku.cs.task_management.exceptions.NotFoundMemberException;
 import ku.cs.task_management.exceptions.NotFoundProjectException;
 import ku.cs.task_management.exceptions.NotFoundTaskException;
+import ku.cs.task_management.repositories.MemberRepository;
+import ku.cs.task_management.repositories.ParticipationRepository;
 import ku.cs.task_management.repositories.ProjectRepository;
 import ku.cs.task_management.repositories.TaskRepository;
 import ku.cs.task_management.requests.task_requests.TaskCreateRequest;
@@ -28,6 +34,10 @@ public class TaskService {
     private ModelMapper modelMapper;
     @Autowired
     private ProjectRepository projectRepository;
+    @Autowired
+    private MemberRepository memberRepository;
+    @Autowired
+    private ParticipationRepository participationRepository;
 
     public List<TaskResponse> getAllTasks() {
         List<TaskResponse> responses = new ArrayList<>();
@@ -38,7 +48,7 @@ public class TaskService {
     }
 
     // create task
-    public TaskResponse createTask(TaskCreateRequest request) throws NotFoundProjectException {
+    public TaskResponse createTask(TaskCreateRequest request) throws NotFoundProjectException, NotFoundMemberException {
 
         Task task = new Task();
 
@@ -49,6 +59,16 @@ public class TaskService {
         task.setTaskStatus(TaskStatus.TODO);
 
         Task createdTask = taskRepository.save(task);
+
+        Member member = memberRepository.findById(request.getTaskOwnerId())
+                .orElseThrow(() -> new NotFoundMemberException(request.getTaskOwnerId()));
+
+        ParticipationKey participationKey = new ParticipationKey(createdTask.getTaskId(), member.getMemberId());
+        Participation participate = new Participation();
+        participate.setId(participationKey);
+        participate.setTask(createdTask);
+        participate.setMember(member);
+        participationRepository.save(participate);
 
         return modelMapper.map(createdTask, TaskResponse.class);
     }

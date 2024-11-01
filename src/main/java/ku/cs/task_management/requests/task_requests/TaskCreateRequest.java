@@ -9,4 +9,5 @@ public class TaskCreateRequest {
     private String taskName;
     private String taskDetail;
     private UUID taskProjectId;
+    private UUID taskOwnerId;
 }

@@ -44,15 +44,15 @@ public class ParticipateService {
         return responses;
     }
 
-    public SuccessResponse addParticipation(UUID taskId, List<Member> members) throws NotFoundMemberException, NotFoundTaskException {
+    public SuccessResponse addParticipation(UUID taskId, List<UUID> members) throws NotFoundMemberException, NotFoundTaskException {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NotFoundTaskException(taskId));
-        for (Member member : members) {
-            memberRepository.findById(member.getMemberId())
-                    .orElseThrow(() -> new NotFoundMemberException(member.getMemberId()));
+        for (UUID memberId : members) {
+            Member member = memberRepository.findById(memberId)
+                                            .orElseThrow(() -> new NotFoundMemberException(memberId));
 
             Participation participation = new Participation();
-            participation.setId(new ParticipationKey(member.getMemberId(), task.getTaskId()));
+            participation.setId(new ParticipationKey(memberId, task.getTaskId()));
             participation.setTask(task);
             participation.setMember(member);
 

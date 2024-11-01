@@ -6,6 +6,6 @@ import java.util.List;
 
 @Data
 public class HomeResponse {
-    private List<TaskResponse> tasks;
+    private List<KanBanResponse> tasks;
     private List<RecentlyViewResponse> recentlyViews;
 }

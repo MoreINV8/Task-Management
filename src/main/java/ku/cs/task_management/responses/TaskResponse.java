@@ -1,9 +1,7 @@
 package ku.cs.task_management.responses;
 
 import ku.cs.task_management.commons.TaskStatus;
-import ku.cs.task_management.entities.Comment;
-import ku.cs.task_management.entities.Project;
-import ku.cs.task_management.entities.Task;
+import ku.cs.task_management.entities.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -20,6 +18,7 @@ public class TaskResponse {
     private TaskStatus taskStatus;
     private UUID taskProjectId;
     private List<CommentResponse> taskComments;
+    private List<Member> taskParticipants;
 
     public TaskResponse(Task t) {
         this.taskId = t.getTaskId();

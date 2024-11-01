@@ -43,7 +43,7 @@ public class TaskController {
     }
     @PostMapping("/task/create")
     public ResponseEntity<TaskResponse> createTask(@RequestBody TaskCreateRequest request)
-        throws NotFoundProjectException {
+            throws NotFoundProjectException, NotFoundMemberException {
         return new ResponseEntity<>(taskService.createTask(request), HttpStatus.CREATED);
     }
 
@@ -67,7 +67,7 @@ public class TaskController {
 
     // participate POST
     @PostMapping("/task/addParticipate")
-    public ResponseEntity<SuccessResponse> addParticipate(@RequestParam UUID t, @RequestBody List<Member> members) throws NotFoundTaskException, NotFoundMemberException {
+    public ResponseEntity<SuccessResponse> addParticipate(@RequestParam UUID t, @RequestBody List<UUID> members) throws NotFoundTaskException, NotFoundMemberException {
         return new ResponseEntity<>(participateService.addParticipation(t, members), HttpStatus.OK);
     }
 

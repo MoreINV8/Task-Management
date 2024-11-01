@@ -6,6 +6,7 @@ import ku.cs.task_management.entities.Task;
 import ku.cs.task_management.repositories.ParticipationRepository;
 import ku.cs.task_management.repositories.RecentlyRepository;
 import ku.cs.task_management.responses.HomeResponse;
+import ku.cs.task_management.responses.KanBanResponse;
 import ku.cs.task_management.responses.RecentlyViewResponse;
 import ku.cs.task_management.responses.TaskResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,9 +43,9 @@ public class HomeService {
         List<Task> tasks = participationList.stream()
                 .map(Participation::getTask)
                 .collect(Collectors.toList());
-        List<TaskResponse> taskResponses = new ArrayList<>();
+        List<KanBanResponse> taskResponses = new ArrayList<>();
         for (Task task : tasks) {
-            taskResponses.add(new TaskResponse(task));
+            taskResponses.add(new KanBanResponse(task));
         }
         response.setTasks(taskResponses);
         response.setRecentlyViews(recentlyViewResponses);
