@@ -29,8 +29,7 @@ public class ComponentConfig {
                 registry.addMapping("/**")
                         .allowedOrigins("http://localhost:3000") // Replace with your front-end URL
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("Content-Type", "Authorization") // Add Content-Type
-                        .allowCredentials(true);
+                        .allowedHeaders("*");
             }
         };
     }

@@ -8,5 +8,6 @@ import java.util.UUID;
 public class AssignResponse {
     private UUID memberId;
     private String memberName;
+    private String memberLastName;
     private String role;
 }

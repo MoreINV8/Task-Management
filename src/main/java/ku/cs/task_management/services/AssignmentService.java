@@ -14,7 +14,6 @@ import ku.cs.task_management.requests.assignment_requests.AssignRequest;
 import ku.cs.task_management.requests.assignment_requests.KickRequest;
 import ku.cs.task_management.responses.AssignResponse;
 import ku.cs.task_management.responses.SuccessResponse;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -33,8 +32,6 @@ public class AssignmentService {
 
     @Autowired
     private MemberRepository memberRepository;
-    @Autowired
-    private ModelMapper modelMapper;
 
     public List<Assignment> getAllAssignments() {
         return assignmentRepository.findAll();
@@ -48,12 +45,12 @@ public class AssignmentService {
             AssignResponse response = new AssignResponse();
             response.setMemberId(assignment.getMember().getMemberId());
             response.setMemberName(assignment.getMember().getDetail().getMemberName());
+            response.setMemberLastName(assignment.getMember().getDetail().getMemberLastname());
             response.setRole(assignment.getRole());
             responses.add(response);
         }
         return responses;
     }
-
     public SuccessResponse assign(UUID projectId, AssignRequest request) throws NotFoundProjectException, NotFoundMemberException {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new NotFoundProjectException(projectId));

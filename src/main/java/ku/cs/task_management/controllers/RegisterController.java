@@ -5,7 +5,6 @@ import ku.cs.task_management.requests.member_requests.MemberSignupRequest;
 import ku.cs.task_management.responses.MemberResponse;
 import ku.cs.task_management.services.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

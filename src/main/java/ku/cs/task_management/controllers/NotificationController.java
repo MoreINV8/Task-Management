@@ -1,6 +1,5 @@
 package ku.cs.task_management.controllers;
 
-import ku.cs.task_management.exceptions.InvalidNotificationTypeException;
 import ku.cs.task_management.exceptions.InvalidRequestException;
 import ku.cs.task_management.exceptions.NotFoundMemberException;
 import ku.cs.task_management.exceptions.NotFoundNotificationException;
