@@ -40,7 +40,6 @@ public class RecentlyService {
 
         RecentlyView recentlyView = recentlyViews.get(recentlyViews.size() - 1); // last recently object
 
-        recentlyView.setRecentlyTask(null);
         recentlyView.setRecentlyProject(null);
         recentlyView.setRecentViewer(null);
 

@@ -24,10 +24,6 @@ public class RecentlyView {
     private Project recentlyProject;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "task_id_fk")
-    private Task recentlyTask;
-
-    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "member_id_fk")
     private Member recentViewer;
 }
