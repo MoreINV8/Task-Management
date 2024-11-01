@@ -3,9 +3,10 @@ package ku.cs.task_management.services;
 import ku.cs.task_management.entities.Member;
 import ku.cs.task_management.entities.Project;
 import ku.cs.task_management.entities.RecentlyView;
-import ku.cs.task_management.entities.Task;
 import ku.cs.task_management.exceptions.NotFoundMemberException;
+import ku.cs.task_management.exceptions.NotFoundProjectException;
 import ku.cs.task_management.repositories.MemberRepository;
+import ku.cs.task_management.repositories.ProjectRepository;
 import ku.cs.task_management.repositories.RecentlyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,9 @@ public class RecentlyService {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired
+    private ProjectRepository projectRepository;
 
     @Autowired
     private RecentlyRepository recentlyRepository;
@@ -44,13 +48,28 @@ public class RecentlyService {
         recentlyRepository.delete(recentlyView);
     }
 
-    public void saveRecently(Member viewer, Project project) {
-        RecentlyView recentlyView = new RecentlyView();
-        recentlyView.setRecentViewer(viewer);
+    public void saveRecently(UUID viewerId, UUID projectId) throws NotFoundMemberException, NotFoundProjectException {
 
-        recentlyView.setRecentlyProject(project);
+        Member viewer = memberRepository.findById(viewerId)
+                .orElseThrow(() -> new NotFoundMemberException(viewerId));
 
-        recentlyView.setRecentlyTime(LocalDateTime.now());
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new NotFoundProjectException(projectId));
+
+        if (recentlyRepository.countByViewerId(viewerId) == 10) {
+            deleteLastRecently(viewerId);
+        }
+
+        RecentlyView recentlyView = recentlyRepository.findByViewerAndProjectId(viewerId, projectId);
+        if (recentlyView == null) {
+            recentlyView = new RecentlyView();
+
+            recentlyView.setRecentViewer(viewer);
+            recentlyView.setRecentlyProject(project);
+            recentlyView.setRecentlyTime(LocalDateTime.now());
+        } else {
+            recentlyView.setRecentlyTime(LocalDateTime.now());
+        }
 
         recentlyRepository.save(recentlyView);
     }

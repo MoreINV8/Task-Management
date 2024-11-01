@@ -15,4 +15,14 @@ public interface RecentlyRepository extends JpaRepository<RecentlyView, UUID> {
             value = "SELECT r FROM RecentlyView r WHERE r.recentViewer.memberId = :id ORDER BY r.recentlyTime"
     )
     List<RecentlyView> findByMemberId(@Param("id")UUID id);
+
+    @Query(
+            value = "SELECT COUNT(r) FROM RecentlyView r WHERE r.recentViewer.memberId = :id"
+    )
+    int countByViewerId(@Param("id")UUID id);
+
+    @Query(
+            value = "SELECT r FROM RecentlyView r WHERE r.recentViewer.memberId = :viewerId AND r.recentlyProject.projectId = :projectId"
+    )
+    RecentlyView findByViewerAndProjectId(@Param("viewerId") UUID viewerId, @Param("projectId") UUID projectId);
 }
