@@ -1,7 +1,6 @@
 package ku.cs.task_management.entities;
 
 import jakarta.persistence.*;
-import ku.cs.task_management.commons.RecentlyType;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -19,9 +18,6 @@ public class RecentlyView {
 
     @Column(name = "recently_time")
     private LocalDateTime recentlyTime;
-
-    @Column(name = "recently_type")
-    private RecentlyType recentlyType;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "project_id_fk")

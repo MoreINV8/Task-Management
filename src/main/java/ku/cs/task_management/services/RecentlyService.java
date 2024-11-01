@@ -1,6 +1,5 @@
 package ku.cs.task_management.services;
 
-import ku.cs.task_management.commons.RecentlyType;
 import ku.cs.task_management.entities.Member;
 import ku.cs.task_management.entities.Project;
 import ku.cs.task_management.entities.RecentlyView;
@@ -9,7 +8,6 @@ import ku.cs.task_management.exceptions.NotFoundMemberException;
 import ku.cs.task_management.repositories.MemberRepository;
 import ku.cs.task_management.repositories.RecentlyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -46,15 +44,11 @@ public class RecentlyService {
         recentlyRepository.delete(recentlyView);
     }
 
-    public void saveRecently(Member viewer, Object object, RecentlyType type) {
+    public void saveRecently(Member viewer, Project project) {
         RecentlyView recentlyView = new RecentlyView();
-        recentlyView.setRecentlyType(type);
         recentlyView.setRecentViewer(viewer);
 
-        switch (type) {
-            case PROJECT -> recentlyView.setRecentlyProject((Project) object);
-            case TASK -> recentlyView.setRecentlyTask((Task) object);
-        }
+        recentlyView.setRecentlyProject(project);
 
         recentlyView.setRecentlyTime(LocalDateTime.now());
 
