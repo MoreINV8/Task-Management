@@ -1,13 +1,15 @@
 package ku.cs.task_management.services;
 
+import ku.cs.task_management.entities.Assignment;
 import ku.cs.task_management.entities.Meeting;
 import ku.cs.task_management.entities.Project;
-import ku.cs.task_management.exceptions.NotFoundMeetingException;
-import ku.cs.task_management.exceptions.NotFoundProjectException;
+import ku.cs.task_management.exceptions.*;
+import ku.cs.task_management.repositories.AssignmentRepository;
 import ku.cs.task_management.repositories.MeetingRepository;
 import ku.cs.task_management.repositories.ProjectRepository;
 import ku.cs.task_management.requests.meeting_requests.MeetingCreateRequest;
 import ku.cs.task_management.requests.meeting_requests.MeetingRequest;
+import ku.cs.task_management.requests.notification_requests.NotificationSendRequest;
 import ku.cs.task_management.responses.MeetingResponse;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +26,11 @@ public class MeetingService {
     @Autowired
     private ProjectRepository projectRepository;
     @Autowired
+    private AssignmentRepository assignmentRepository;
+    @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private NotificationService notificationService;
 
     public List<Meeting> getAllMeetings() {
         return meetingRepository.findAll();
@@ -42,7 +48,7 @@ public class MeetingService {
         return responses;
     }
 
-    public MeetingResponse createMeeting(MeetingCreateRequest request) throws NotFoundProjectException {
+    public MeetingResponse createMeeting(MeetingCreateRequest request) throws NotFoundProjectException, NotFoundTaskException, NotFoundMeetingException, InvalidRequestException, NotFoundMemberException {
         Meeting meeting = new Meeting();
 
         meeting.setMeetingTopic(request.getMeetingTopic());
@@ -52,6 +58,12 @@ public class MeetingService {
                 .orElseThrow(() -> new NotFoundProjectException(request.getMeetingProjectId())));
 
         Meeting createdMeeting = meetingRepository.save(meeting);
+
+        // send notification to all member in project
+        for (Assignment assignment : assignmentRepository.findAllByProjectProjectId(createdMeeting.getMeetingProject().getProjectId())) {
+            notificationService.insertNotification(NotificationSendRequest.meeting(createdMeeting.getMeetingId()), assignment.getMember().getMemberId());
+        }
+
         return modelMapper.map(createdMeeting, MeetingResponse.class);
     }
 

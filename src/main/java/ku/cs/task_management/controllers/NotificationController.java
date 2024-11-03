@@ -1,8 +1,6 @@
 package ku.cs.task_management.controllers;
 
-import ku.cs.task_management.exceptions.InvalidRequestException;
-import ku.cs.task_management.exceptions.NotFoundMemberException;
-import ku.cs.task_management.exceptions.NotFoundNotificationException;
+import ku.cs.task_management.exceptions.*;
 import ku.cs.task_management.requests.notification_requests.NotificationSendRequest;
 import ku.cs.task_management.responses.NotificationResponse;
 import ku.cs.task_management.responses.SuccessResponse;
@@ -23,7 +21,7 @@ public class NotificationController {
 
     @PostMapping("/notification")
     public ResponseEntity<NotificationResponse> sendNotification(@RequestBody NotificationSendRequest request)
-            throws InvalidRequestException, NotFoundMemberException {
+            throws InvalidRequestException, NotFoundMemberException, NotFoundTaskException, NotFoundProjectException, NotFoundMeetingException {
         return new ResponseEntity<>(notificationService.insertNotification(request), HttpStatus.CREATED);
     }
 

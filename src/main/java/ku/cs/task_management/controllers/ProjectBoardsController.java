@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 @RestController
-public class ProjectListController {
+public class ProjectBoardsController {
 
     @Autowired
     private ProjectService projectService;
@@ -21,7 +21,7 @@ public class ProjectListController {
     @Autowired
     private AssignmentService assignmentService;
 
-    @GetMapping("/project-list")
+    @GetMapping("/project-boards")
     public ResponseEntity<ProjectListResponse> projectList(@RequestParam UUID m)
             throws NotFoundMemberException {
         return ResponseEntity.ok(

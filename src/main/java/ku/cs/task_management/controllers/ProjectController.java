@@ -5,12 +5,14 @@ import ku.cs.task_management.exceptions.*;
 import ku.cs.task_management.repositories.MemberRepository;
 import ku.cs.task_management.requests.assignment_requests.AssignRequest;
 import ku.cs.task_management.requests.assignment_requests.KickRequest;
+import ku.cs.task_management.requests.notification_requests.NotificationSendRequest;
 import ku.cs.task_management.requests.project_requests.ProjectFavourRequest;
 import ku.cs.task_management.requests.project_requests.ProjectRequest;
 import ku.cs.task_management.responses.AssignResponse;
 import ku.cs.task_management.responses.ProjectResponse;
 import ku.cs.task_management.responses.SuccessResponse;
 import ku.cs.task_management.services.AssignmentService;
+import ku.cs.task_management.services.NotificationService;
 import ku.cs.task_management.services.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,9 +29,10 @@ public class ProjectController {
     private ProjectService projectService;
 
     @Autowired
-    private MemberRepository memberRepository;
-    @Autowired
     private AssignmentService assignmentService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @GetMapping("/project/")
     public List<Project> getAllProjects() {
@@ -61,7 +64,10 @@ public class ProjectController {
 
     // assignment POST
     @PostMapping("/{projectId}/assign")
-    public ResponseEntity<SuccessResponse> assignMember(@PathVariable UUID projectId, @RequestBody AssignRequest request) throws NotFoundProjectException, NotFoundMemberException {
+    public ResponseEntity<SuccessResponse> assignMember(@PathVariable UUID projectId, @RequestBody AssignRequest request) throws NotFoundProjectException, NotFoundMemberException, NotFoundTaskException, NotFoundMeetingException, InvalidRequestException {
+        // and notification to added member
+        notificationService.insertNotification(NotificationSendRequest.project(projectId), request.getEmail());
+
         return new ResponseEntity<>(assignmentService.assign(projectId, request), HttpStatus.OK);
     }
 

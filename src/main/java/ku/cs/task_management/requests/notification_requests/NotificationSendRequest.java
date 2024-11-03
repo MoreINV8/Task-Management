@@ -1,6 +1,8 @@
 package ku.cs.task_management.requests.notification_requests;
 
 import ku.cs.task_management.commons.NotificationType;
+import ku.cs.task_management.entities.Member;
+import ku.cs.task_management.services.NotificationService;
 import lombok.Data;
 
 import java.util.UUID;
@@ -11,16 +13,31 @@ public class NotificationSendRequest {
 
     private NotificationType type;
 
-    private UUID projectId;
-    private UUID taskId;
-    private UUID meetingId;
+    private UUID objectId;
 
-    private UUID receiverId;
+    private Member receiver;
 
-    public int isTypeMatch() {
-        if (type.equals(NotificationType.PROJECT) && projectId != null) return NotificationType.PROJECT.ordinal();
-        else if (type.equals(NotificationType.TASK) && taskId != null) return NotificationType.TASK.ordinal();
-        else if (type.equals(NotificationType.MEETING) && meetingId != null) return NotificationType.MEETING.ordinal();
-        return -1;
+    public static NotificationSendRequest project(UUID projectId) {
+        NotificationSendRequest n = new NotificationSendRequest();
+        n.setObjectId(projectId);
+        n.setType(NotificationType.PROJECT);
+
+        return n;
+    }
+
+    public static NotificationSendRequest task(UUID taskId) {
+        NotificationSendRequest n = new NotificationSendRequest();
+        n.setObjectId(taskId);
+        n.setType(NotificationType.TASK);
+
+        return n;
+    }
+
+    public static NotificationSendRequest meeting(UUID meetingId) {
+        NotificationSendRequest n = new NotificationSendRequest();
+        n.setObjectId(meetingId);
+        n.setType(NotificationType.MEETING);
+
+        return n;
     }
 }

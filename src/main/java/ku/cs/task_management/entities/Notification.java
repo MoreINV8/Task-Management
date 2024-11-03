@@ -19,9 +19,6 @@ public class Notification {
     @Column(name = "notification_time")
     private LocalDateTime notificationTime;
 
-    @Column(name = "notification_detail")
-    private String notificationDetail;
-
     @Column(name = "notification_status")
     private NotificationStatus notificationStatus;
 

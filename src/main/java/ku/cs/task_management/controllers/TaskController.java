@@ -4,10 +4,12 @@ import ku.cs.task_management.commons.TaskStatus;
 import ku.cs.task_management.entities.Member;
 import ku.cs.task_management.entities.Participation;
 import ku.cs.task_management.exceptions.*;
+import ku.cs.task_management.requests.notification_requests.NotificationSendRequest;
 import ku.cs.task_management.requests.task_requests.TaskCreateRequest;
 import ku.cs.task_management.requests.task_requests.TaskUpdateRequest;
 import ku.cs.task_management.responses.SuccessResponse;
 import ku.cs.task_management.responses.TaskResponse;
+import ku.cs.task_management.services.NotificationService;
 import ku.cs.task_management.services.ParticipateService;
 import ku.cs.task_management.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,8 @@ public class TaskController {
     private TaskService taskService;
     @Autowired
     private ParticipateService participateService;
+    @Autowired
+    private NotificationService notificationService;
 
     @GetMapping("/task")
     public List<TaskResponse> getTasks() {
@@ -67,7 +71,12 @@ public class TaskController {
 
     // participate POST
     @PostMapping("/task/addParticipate")
-    public ResponseEntity<SuccessResponse> addParticipate(@RequestParam UUID t, @RequestBody List<UUID> members) throws NotFoundTaskException, NotFoundMemberException {
+    public ResponseEntity<SuccessResponse> addParticipate(@RequestParam UUID t, @RequestBody List<UUID> members) throws NotFoundTaskException, NotFoundMemberException, NotFoundProjectException, NotFoundMeetingException, InvalidRequestException {
+        // add notification to added task member
+        for (UUID memberId : members) {
+            notificationService.insertNotification(NotificationSendRequest.task(t), memberId);
+        }
+
         return new ResponseEntity<>(participateService.addParticipation(t, members), HttpStatus.OK);
     }
 

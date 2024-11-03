@@ -4,14 +4,10 @@ import ku.cs.task_management.commons.NotificationStatus;
 import ku.cs.task_management.commons.NotificationType;
 import ku.cs.task_management.entities.Member;
 import ku.cs.task_management.entities.Notification;
-import ku.cs.task_management.exceptions.InvalidNotificationTypeException;
-import ku.cs.task_management.exceptions.InvalidRequestException;
-import ku.cs.task_management.exceptions.NotFoundMemberException;
-import ku.cs.task_management.exceptions.NotFoundNotificationException;
+import ku.cs.task_management.exceptions.*;
 import ku.cs.task_management.repositories.*;
 import ku.cs.task_management.requests.notification_requests.NotificationSendRequest;
-import ku.cs.task_management.responses.NotificationResponse;
-import ku.cs.task_management.responses.SuccessResponse;
+import ku.cs.task_management.responses.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -44,32 +40,56 @@ public class NotificationService {
     private ModelMapper modelMapper;
 
     public NotificationResponse insertNotification(NotificationSendRequest request)
-            throws NotFoundMemberException, InvalidRequestException {
-
-        // check if member account was existed
-        Member receiver = memberRepository.findById(request.getReceiverId())
-                .orElseThrow(() -> new NotFoundMemberException(request.getReceiverId()));
+            throws InvalidRequestException, NotFoundProjectException, NotFoundTaskException, NotFoundMeetingException {
 
         // retrieve data from request
         Notification notification = new Notification();
 
         // check type
-        switch (request.isTypeMatch()) {
-            case (0) -> notification.setNotificationProject(projectRepository.getReferenceById(request.getProjectId()));
-            case (1) -> notification.setNotificationTask(taskRepository.getReferenceById(request.getTaskId()));
-            case (2) -> notification.setNotificationMeeting(meetingRepository.getReferenceById(request.getMeetingId()));
+        switch (request.getType()) {
+            case PROJECT -> notification.setNotificationProject(
+                    projectRepository.findById(request.getObjectId())
+                            .orElseThrow(() -> new NotFoundProjectException(request.getObjectId()))
+            );
+            case TASK -> notification.setNotificationTask(
+                    taskRepository.findById(request.getObjectId())
+                            .orElseThrow(() -> new NotFoundTaskException(request.getObjectId()))
+            );
+            case MEETING -> notification.setNotificationMeeting(
+                    meetingRepository.findById(request.getObjectId())
+                            .orElseThrow(() -> new NotFoundMeetingException(request.getObjectId()))
+            );
             default -> throw new InvalidRequestException();
         }
-
-        notification.setNotificationDetail(request.getNotificationDetail());
 
         // set value
         notification.setNotificationTime(LocalDateTime.now());
         notification.setNotificationStatus(NotificationStatus.UNREAD);
-        notification.setNotificationReceiver(receiver);
+        notification.setNotificationReceiver(request.getReceiver());
 
         // get response
         return getResponse(notificationRepository.save(notification));
+    }
+
+    public NotificationResponse insertNotification(NotificationSendRequest request, UUID receiverId) throws NotFoundTaskException, NotFoundProjectException, NotFoundMeetingException, InvalidRequestException, NotFoundMemberException {
+        Member receiver = memberRepository.findById(receiverId)
+                .orElseThrow(() -> new NotFoundMemberException(receiverId));
+
+        request.setReceiver(receiver);
+
+        return insertNotification(request);
+    }
+
+    public NotificationResponse insertNotification(NotificationSendRequest request, String email) throws NotFoundTaskException, NotFoundProjectException, NotFoundMeetingException, InvalidRequestException, NotFoundMemberException {
+        Member receiver = memberRepository.findMemberByEmail(email);
+
+        if (receiver == null) {
+            throw new NotFoundMemberException(email);
+        }
+
+        request.setReceiver(receiver);
+
+        return insertNotification(request);
     }
 
     public List<NotificationResponse> getNotificationFromMemberId(UUID mId)
@@ -129,20 +149,17 @@ public class NotificationService {
         // formatting response
         NotificationResponse response = modelMapper.map(notification, NotificationResponse.class);
 
-        response.setReceiverId(notification.getNotificationReceiver().getMemberId());
-
-        // TODO: ถ้าทำเสร็จแล้วอย่ากส่งเป็น object ออกไปเลยค่อยมาแก้
         if (notification.getNotificationProject() != null) {
             response.setType(NotificationType.PROJECT);
-            response.setProjectId(notification.getNotificationProject().getProjectId());
+            response.setProject(new ProjectResponse(notification.getNotificationProject()));
         }
         if (notification.getNotificationTask() != null) {
             response.setType(NotificationType.TASK);
-            response.setTaskId(notification.getNotificationTask().getTaskId());
+            response.setTask(new TaskResponse(notification.getNotificationTask()));
         }
         if (notification.getNotificationMeeting() != null) {
             response.setType(NotificationType.MEETING);
-            response.setMeetingId(notification.getNotificationMeeting().getMeetingId());
+            response.setMeeting(new MeetingResponse(notification.getNotificationMeeting()));
         }
 
         return response;
