@@ -10,4 +10,5 @@ public class AssignResponse {
     private String memberName;
     private String memberLastName;
     private String role;
+    private String img;
 }

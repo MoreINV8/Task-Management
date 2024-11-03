@@ -13,8 +13,10 @@ import ku.cs.task_management.repositories.ProjectRepository;
 import ku.cs.task_management.requests.assignment_requests.AssignRequest;
 import ku.cs.task_management.requests.assignment_requests.KickRequest;
 import ku.cs.task_management.responses.AssignResponse;
+import ku.cs.task_management.responses.MemberResponse;
 import ku.cs.task_management.responses.ProjectResponse;
 import ku.cs.task_management.responses.SuccessResponse;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -34,9 +36,8 @@ public class AssignmentService {
     @Autowired
     private MemberRepository memberRepository;
 
-    public List<Assignment> getAllAssignments() {
-        return assignmentRepository.findAll();
-    }
+    @Autowired
+    private ModelMapper modelMapper;
 
     // TODO: return in List of Object or just return in List of UUID, which one is better
     public List<AssignResponse> getAllMembersByProjectId(UUID projectId) throws NotFoundProjectException {
@@ -48,6 +49,7 @@ public class AssignmentService {
             response.setMemberName(assignment.getMember().getDetail().getMemberName());
             response.setMemberLastName(assignment.getMember().getDetail().getMemberLastname());
             response.setRole(assignment.getRole());
+            response.setImg(assignment.getMember().getDetail().getImg());
             responses.add(response);
         }
         return responses;
@@ -57,7 +59,10 @@ public class AssignmentService {
         List<ProjectResponse> responses = new ArrayList<>();
 
         for (Assignment assignment:assignmentRepository.findAllByMemberMemberId(memberId)) {
-            responses.add(new ProjectResponse(assignment.getProject()));
+            ProjectResponse projectResponse = new ProjectResponse(assignment.getProject());
+            projectResponse.setProjectOwner(modelMapper.map(assignment.getProject().getProjectOwner(), MemberResponse.class));
+
+            responses.add(projectResponse);
         }
 
         return responses;

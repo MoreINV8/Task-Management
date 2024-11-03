@@ -151,7 +151,10 @@ public class NotificationService {
 
         if (notification.getNotificationProject() != null) {
             response.setType(NotificationType.PROJECT);
-            response.setProject(new ProjectResponse(notification.getNotificationProject()));
+            ProjectResponse projectResponse = new ProjectResponse(notification.getNotificationProject());
+            projectResponse.setProjectOwner(modelMapper.map(notification.getNotificationProject().getProjectOwner(), MemberResponse.class));
+
+            response.setProject(projectResponse);
         }
         if (notification.getNotificationTask() != null) {
             response.setType(NotificationType.TASK);

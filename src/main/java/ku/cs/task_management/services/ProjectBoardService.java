@@ -7,6 +7,7 @@ import ku.cs.task_management.exceptions.NotFoundProjectException;
 import ku.cs.task_management.repositories.ParticipationRepository;
 import ku.cs.task_management.repositories.ProjectRepository;
 import ku.cs.task_management.responses.*;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +30,8 @@ public class ProjectBoardService {
     private LogService logService;
     @Autowired
     private ProjectRepository projectRepository;
+    @Autowired
+    private ModelMapper modelMapper;
 
     public ProjectBoardResponse getProjectBoard(UUID projectId) throws NotFoundProjectException {
         ProjectBoardResponse projectBoardResponse = new ProjectBoardResponse();
@@ -38,6 +41,8 @@ public class ProjectBoardService {
 
         if (project != null) {
             ProjectResponse projectResponse = new ProjectResponse(project);
+            projectResponse.setProjectOwner(modelMapper.map(project.getProjectOwner(), MemberResponse.class));
+
             List<AssignResponse> assignList = assignmentService.getAllMembersByProjectId(projectId);
             List<TaskResponse> taskList = taskService.getAllTasksByProjectId(projectId);
             for (TaskResponse task : taskList) {
