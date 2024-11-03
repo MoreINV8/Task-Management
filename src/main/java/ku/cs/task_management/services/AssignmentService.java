@@ -40,16 +40,13 @@ public class AssignmentService {
     private ModelMapper modelMapper;
 
     // TODO: return in List of Object or just return in List of UUID, which one is better
-    public List<AssignResponse> getAllMembersByProjectId(UUID projectId) throws NotFoundProjectException {
+    public List<AssignResponse> getAllMembersByProjectId(UUID projectId)
+            throws NotFoundProjectException {
+
         projectRepository.findById(projectId).orElseThrow(() -> new NotFoundProjectException(projectId));
         List<AssignResponse> responses = new ArrayList<>();
         for (Assignment assignment : assignmentRepository.findAllByProjectProjectId(projectId)) {
-            AssignResponse response = new AssignResponse();
-            response.setMemberId(assignment.getMember().getMemberId());
-            response.setMemberName(assignment.getMember().getDetail().getMemberName());
-            response.setMemberLastName(assignment.getMember().getDetail().getMemberLastname());
-            response.setRole(assignment.getRole());
-            response.setImg(assignment.getMember().getDetail().getImg());
+            AssignResponse response = new AssignResponse(assignment);
             responses.add(response);
         }
         return responses;
@@ -68,7 +65,9 @@ public class AssignmentService {
         return responses;
     }
 
-    public SuccessResponse assign(UUID projectId, AssignRequest request) throws NotFoundProjectException, NotFoundMemberException {
+    public SuccessResponse assign(UUID projectId, AssignRequest request)
+            throws NotFoundProjectException, NotFoundMemberException {
+
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new NotFoundProjectException(projectId));
 
@@ -88,7 +87,9 @@ public class AssignmentService {
         return new SuccessResponse(member.getMemberId() + " was added into " + projectId, HttpStatus.OK);
     }
 
-    public SuccessResponse unassign(UUID projectId, KickRequest request) throws NotFoundProjectException, NotFoundMemberException, NotFoundAssignmentException {
+    public SuccessResponse unassign(UUID projectId, KickRequest request)
+            throws NotFoundProjectException, NotFoundMemberException, NotFoundAssignmentException {
+
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new NotFoundProjectException(projectId));
 

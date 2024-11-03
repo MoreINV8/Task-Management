@@ -28,11 +28,9 @@ public class ParticipateService {
     @Autowired
     private MemberRepository memberRepository;
 
-    public List<Participation> getParticipation() {
-        return participationRepository.findAll();
-    }
+    public List<Participation> getAllParticipationByTaskId(UUID taskId)
+            throws NotFoundTaskException {
 
-    public List<Participation> getAllParticipationByTaskId(UUID taskId) throws NotFoundTaskException {
         Task task = taskRepository.findById(taskId).orElseThrow(() -> new NotFoundTaskException(taskId));
         List<Participation> responses = new ArrayList<>();
         for (Participation participation : participationRepository.findAllByTaskTaskId(taskId)) {
@@ -44,7 +42,9 @@ public class ParticipateService {
         return responses;
     }
 
-    public SuccessResponse addParticipation(UUID taskId, List<UUID> members) throws NotFoundMemberException, NotFoundTaskException {
+    public SuccessResponse addParticipation(UUID taskId, List<UUID> members)
+            throws NotFoundMemberException, NotFoundTaskException {
+
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NotFoundTaskException(taskId));
         for (UUID memberId : members) {
@@ -61,7 +61,9 @@ public class ParticipateService {
         return new SuccessResponse("successfully added to task " + task.getTaskId(), HttpStatus.OK);
     }
 
-    public SuccessResponse removeParticipation(UUID taskId, List<UUID> participants) throws NotFoundTaskException, NotFoundMemberException, NotFoundParticipationException {
+    public SuccessResponse removeParticipation(UUID taskId, List<UUID> participants)
+            throws NotFoundTaskException, NotFoundMemberException, NotFoundParticipationException {
+
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NotFoundTaskException(taskId));
 

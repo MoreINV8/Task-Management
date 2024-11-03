@@ -36,7 +36,8 @@ public class TaskController {
     }
 
     @GetMapping("/all-task")
-    public ResponseEntity<List<TaskResponse>> getAllTasksByProjectId(@RequestParam UUID p) throws NotFoundProjectException {
+    public ResponseEntity<List<TaskResponse>> getAllTasksByProjectId(@RequestParam UUID p)
+            throws NotFoundProjectException {
         return new ResponseEntity<>(taskService.getAllTasksByProjectId(p), HttpStatus.OK);
     }
 
@@ -48,7 +49,7 @@ public class TaskController {
     @PostMapping("/task/create")
     public ResponseEntity<TaskResponse> createTask(@RequestBody TaskCreateRequest request)
             throws NotFoundProjectException, NotFoundMemberException {
-        return new ResponseEntity<>(taskService.createTask(request), HttpStatus.CREATED);
+        return new ResponseEntity<>(taskService.createTask(request), HttpStatus.OK);
     }
 
     @PutMapping("/task/update")
@@ -65,13 +66,15 @@ public class TaskController {
 
     // participate GET
     @GetMapping("/task/participation")
-    public ResponseEntity<List<Participation>> getTaskParticipate(@RequestParam UUID t) throws NotFoundTaskException {
+    public ResponseEntity<List<Participation>> getTaskParticipate(@RequestParam UUID t)
+            throws NotFoundTaskException {
         return new ResponseEntity<>(participateService.getAllParticipationByTaskId(t), HttpStatus.OK);
     }
 
     // participate POST
     @PostMapping("/task/addParticipate")
-    public ResponseEntity<SuccessResponse> addParticipate(@RequestParam UUID t, @RequestBody List<UUID> members) throws NotFoundTaskException, NotFoundMemberException, NotFoundProjectException, NotFoundMeetingException, InvalidRequestException {
+    public ResponseEntity<SuccessResponse> addParticipate(@RequestParam UUID t, @RequestBody List<UUID> members)
+            throws NotFoundTaskException, NotFoundMemberException, NotFoundProjectException, NotFoundMeetingException, InvalidRequestException {
         // add notification to added task member
         for (UUID memberId : members) {
             notificationService.insertNotification(NotificationSendRequest.task(t), memberId);
@@ -82,13 +85,14 @@ public class TaskController {
 
     // participate DELETE
     @DeleteMapping("/task/deleteParticipate")
-    public ResponseEntity<SuccessResponse> deleteParticipate(@RequestParam UUID t, @RequestBody List<UUID> participation) throws NotFoundTaskException, NotFoundMemberException, NotFoundParticipationException {
+    public ResponseEntity<SuccessResponse> deleteParticipate(@RequestParam UUID t, @RequestBody List<UUID> participation)
+            throws NotFoundTaskException, NotFoundMemberException, NotFoundParticipationException {
         return new ResponseEntity<>(participateService.removeParticipation(t, participation), HttpStatus.OK);
     }
 
     @DeleteMapping("/task/delete")
     public ResponseEntity<TaskResponse> deleteTask(@RequestParam UUID p, @RequestParam UUID t)
             throws NotFoundProjectException, NotFoundTaskException {
-        return new ResponseEntity<>(taskService.deleteTask(p, t), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(taskService.deleteTask(p, t), HttpStatus.OK);
     }
 }

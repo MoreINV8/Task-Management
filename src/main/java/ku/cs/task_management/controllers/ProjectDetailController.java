@@ -24,7 +24,8 @@ public class ProjectDetailController {
     private RecentlyService recentlyService;
 
     @GetMapping("/project-detail")
-    public ResponseEntity<ProjectBoardResponse> getProjectBoard(@RequestParam UUID i, @RequestParam UUID m) throws NotFoundProjectException, NotFoundMemberException {
+    public ResponseEntity<ProjectBoardResponse> getProjectBoard(@RequestParam UUID i, @RequestParam UUID m)
+            throws NotFoundProjectException, NotFoundMemberException {
         recentlyService.saveRecently(m, i);
         return new ResponseEntity<>(projectBoardService.getProjectBoard(i), HttpStatus.OK);
     }

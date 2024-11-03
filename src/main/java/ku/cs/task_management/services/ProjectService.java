@@ -38,7 +38,8 @@ public class ProjectService {
         return projectRepository.findAll();
     }
 
-    public List<ProjectResponse> getAllProjectsByOwnerId(UUID memberId) throws NotFoundMemberException {
+    public List<ProjectResponse> getAllProjectsByOwnerId(UUID memberId)
+            throws NotFoundMemberException {
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NotFoundMemberException(memberId));
@@ -46,7 +47,8 @@ public class ProjectService {
         return getProjectsForMember(member);
     }
 
-    public List<ProjectResponse> getAllProjectsByOwnerEmail(String email) throws NotFoundMemberException {
+    public List<ProjectResponse> getAllProjectsByOwnerEmail(String email)
+            throws NotFoundMemberException {
 
         Member member = memberRepository.findMemberByEmail(email);
         if (member == null){
@@ -112,7 +114,9 @@ public class ProjectService {
         return modelMapper.map(updatedProject, ProjectResponse.class);
     }
 
-    public ProjectResponse getProjectDetail(String email, UUID projectId) throws NotFoundMemberException, NotFoundProjectException, NotProjectOwnerException {
+    public ProjectResponse getProjectDetail(String email, UUID projectId)
+            throws NotFoundMemberException, NotFoundProjectException, NotProjectOwnerException {
+
 
         Member member = memberRepository.findMemberByEmail(email);
 

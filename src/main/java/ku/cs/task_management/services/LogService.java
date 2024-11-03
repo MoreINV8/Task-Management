@@ -34,6 +34,7 @@ public class LogService {
 
     public LogResponse saveLog(LogRequest request)
             throws NotFoundMemberException, NotFoundProjectException {
+
         // not found the actor
         Member actor = memberRepository.findById(request.getLogActor())
                 .orElseThrow(() -> new NotFoundMemberException(request.getLogActor()));
@@ -53,6 +54,7 @@ public class LogService {
 
     public List<LogResponse> getLogs(UUID projectId)
             throws NotFoundProjectException {
+
         // not found project
         if (!projectRepository.existsById(projectId)) {
             throw new NotFoundProjectException(projectId);
@@ -64,24 +66,6 @@ public class LogService {
         }
 
         return responses;
-    }
-
-    public void deleteLog(UUID projectId)
-            throws NotFoundProjectException {
-        // in case delete project
-
-        if(!projectRepository.existsById(projectId)) {
-            throw new NotFoundProjectException(projectId);
-        }
-
-        List<Log> logs = logRepository.getLogsByProjectID(projectId);
-        for (Log log : logs) {
-            log.setProject(null);
-            log.setActor(null);
-            logRepository.save(log);
-
-            logRepository.delete(log);
-        }
     }
 
     private LogResponse getResponse(Log log) {

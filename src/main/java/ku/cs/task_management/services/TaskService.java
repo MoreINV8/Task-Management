@@ -49,7 +49,8 @@ public class TaskService {
     }
 
     // create task
-    public TaskResponse createTask(TaskCreateRequest request) throws NotFoundProjectException, NotFoundMemberException {
+    public TaskResponse createTask(TaskCreateRequest request)
+            throws NotFoundProjectException, NotFoundMemberException {
 
         Task task = new Task();
 
@@ -79,7 +80,9 @@ public class TaskService {
         return modelMapper.map(createdTask, TaskResponse.class);
     }
 
-    public List<TaskResponse> getAllTasksByProjectId(UUID projectId) throws NotFoundProjectException {
+    public List<TaskResponse> getAllTasksByProjectId(UUID projectId)
+            throws NotFoundProjectException {
+
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new NotFoundProjectException(projectId));
 
@@ -91,7 +94,9 @@ public class TaskService {
         return responses;
     }
 
-    public TaskResponse updateTaskDetail(TaskUpdateRequest request) throws NotFoundTaskException, NotFoundProjectException {
+    public TaskResponse updateTaskDetail(TaskUpdateRequest request)
+            throws NotFoundTaskException, NotFoundProjectException {
+
         Task task = taskRepository.findById(request.getTaskId())
                 .orElseThrow(() -> new NotFoundTaskException(request.getTaskId()));
 
@@ -105,7 +110,8 @@ public class TaskService {
         return modelMapper.map(updatedTask, TaskResponse.class);
     }
 
-    public TaskResponse deleteTask(UUID projectId, UUID taskId) throws NotFoundProjectException, NotFoundTaskException {
+    public TaskResponse deleteTask(UUID projectId, UUID taskId)
+            throws NotFoundProjectException, NotFoundTaskException {
 
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new NotFoundProjectException(projectId));
@@ -125,7 +131,9 @@ public class TaskService {
         return modelMapper.map(task, TaskResponse.class);
     }
 
-    public TaskResponse getTaskDetail(UUID projectId, UUID taskId) throws NotFoundProjectException, NotFoundTaskException {
+    public TaskResponse getTaskDetail(UUID projectId, UUID taskId)
+            throws NotFoundProjectException, NotFoundTaskException {
+
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new NotFoundProjectException(projectId));
 
@@ -139,7 +147,8 @@ public class TaskService {
     }
 
     // Method to change task status
-    public TaskResponse changeTaskStatus(UUID taskId, TaskStatus newStatus) throws NotFoundTaskException, InvalidRequestException {
+    public TaskResponse changeTaskStatus(UUID taskId, TaskStatus newStatus)
+            throws NotFoundTaskException {
 
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NotFoundTaskException(taskId));

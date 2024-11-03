@@ -27,7 +27,9 @@ public class RecentlyService {
     @Autowired
     private RecentlyRepository recentlyRepository;
 
-    public List<RecentlyView> findRecently(UUID memberId) throws NotFoundMemberException {
+    public List<RecentlyView> findRecently(UUID memberId)
+            throws NotFoundMemberException {
+
         if (!memberRepository.existsById(memberId)) {
             throw new NotFoundMemberException(memberId);
         }
@@ -35,7 +37,9 @@ public class RecentlyService {
         return recentlyRepository.findByMemberId(memberId);
     }
 
-    public void deleteLastRecently(UUID memberId) throws NotFoundMemberException {
+    public void deleteLastRecently(UUID memberId)
+            throws NotFoundMemberException {
+
         List<RecentlyView> recentlyViews = findRecently(memberId);
 
         RecentlyView recentlyView = recentlyViews.get(recentlyViews.size() - 1); // last recently object
@@ -47,7 +51,9 @@ public class RecentlyService {
         recentlyRepository.delete(recentlyView);
     }
 
-    public void saveRecently(UUID viewerId, UUID projectId) throws NotFoundMemberException, NotFoundProjectException {
+    public void saveRecently(UUID viewerId, UUID projectId)
+            throws NotFoundMemberException, NotFoundProjectException {
+
 
         Member viewer = memberRepository.findById(viewerId)
                 .orElseThrow(() -> new NotFoundMemberException(viewerId));

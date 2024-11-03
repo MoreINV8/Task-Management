@@ -36,7 +36,9 @@ public class MeetingService {
         return meetingRepository.findAll();
     }
 
-    public List<MeetingResponse> getAllMeetingByProject(UUID projectId) throws NotFoundProjectException {
+    public List<MeetingResponse> getAllMeetingByProject(UUID projectId)
+            throws NotFoundProjectException {
+
         List<MeetingResponse> responses = new ArrayList<>();
 
         projectRepository.findById(projectId)
@@ -48,7 +50,9 @@ public class MeetingService {
         return responses;
     }
 
-    public MeetingResponse createMeeting(MeetingCreateRequest request) throws NotFoundProjectException, NotFoundTaskException, NotFoundMeetingException, InvalidRequestException, NotFoundMemberException {
+    public MeetingResponse createMeeting(MeetingCreateRequest request)
+            throws NotFoundProjectException, NotFoundTaskException, NotFoundMeetingException, InvalidRequestException, NotFoundMemberException {
+
         Meeting meeting = new Meeting();
 
         meeting.setMeetingTopic(request.getMeetingTopic());
@@ -67,7 +71,9 @@ public class MeetingService {
         return modelMapper.map(createdMeeting, MeetingResponse.class);
     }
 
-    public MeetingResponse getMeetingDetail (MeetingRequest request) throws NotFoundMeetingException, NotFoundProjectException {
+    public MeetingResponse getMeetingDetail (MeetingRequest request)
+            throws NotFoundMeetingException, NotFoundProjectException {
+
         Meeting meeting = meetingRepository.findById(request.getMeetingId())
                 .orElseThrow(() -> new NotFoundMeetingException(request.getMeetingId()));
         projectRepository.findById(request.getMeetingProjectId())
@@ -89,7 +95,9 @@ public class MeetingService {
         return modelMapper.map(updatedMeeting, MeetingResponse.class);
     }
 
-    public MeetingResponse deleteMeeting(MeetingRequest request) throws NotFoundMeetingException, NotFoundProjectException {
+    public MeetingResponse deleteMeeting(MeetingRequest request)
+            throws NotFoundMeetingException, NotFoundProjectException {
+
         Project project = projectRepository.findById(request.getMeetingProjectId())
                 .orElseThrow(() -> new NotFoundProjectException(request.getMeetingProjectId()));
         Meeting meeting = project.getProjectMeetings().stream()

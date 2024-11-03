@@ -21,8 +21,8 @@ public class NotificationController {
 
     @PostMapping("/notification")
     public ResponseEntity<NotificationResponse> sendNotification(@RequestBody NotificationSendRequest request)
-            throws InvalidRequestException, NotFoundMemberException, NotFoundTaskException, NotFoundProjectException, NotFoundMeetingException {
-        return new ResponseEntity<>(notificationService.insertNotification(request), HttpStatus.CREATED);
+            throws InvalidRequestException, NotFoundTaskException, NotFoundProjectException, NotFoundMeetingException {
+        return new ResponseEntity<>(notificationService.insertNotification(request), HttpStatus.OK);
     }
 
     @GetMapping("/notification")
@@ -34,12 +34,12 @@ public class NotificationController {
     @PutMapping("/notification")
     public ResponseEntity<NotificationResponse> readNotification(@RequestParam UUID n)
             throws NotFoundNotificationException, IllegalArgumentException {
-        return new ResponseEntity<>(notificationService.readNotification(n), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(notificationService.readNotification(n), HttpStatus.OK);
     }
 
     @DeleteMapping("/notification")
     public ResponseEntity<SuccessResponse> deleteNotification(@RequestParam UUID n)
             throws NotFoundNotificationException, IllegalArgumentException {
-        return new ResponseEntity<>(notificationService.deleteNotification(n), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(notificationService.deleteNotification(n), HttpStatus.OK);
     }
 }

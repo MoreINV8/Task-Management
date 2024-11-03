@@ -33,7 +33,9 @@ public class ProjectBoardService {
     @Autowired
     private ModelMapper modelMapper;
 
-    public ProjectBoardResponse getProjectBoard(UUID projectId) throws NotFoundProjectException {
+    public ProjectBoardResponse getProjectBoard(UUID projectId)
+            throws NotFoundProjectException {
+
         ProjectBoardResponse projectBoardResponse = new ProjectBoardResponse();
 
         Project project = projectRepository.findById(projectId)
