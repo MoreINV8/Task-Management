@@ -5,6 +5,7 @@ import ku.cs.task_management.entities.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -15,6 +16,7 @@ public class TaskResponse {
     private UUID taskId;
     private String taskName;
     private String taskDetail;
+    private LocalDateTime taskDueDate;
     private TaskStatus taskStatus;
     private UUID taskProjectId;
     private List<CommentResponse> taskComments;
@@ -24,6 +26,7 @@ public class TaskResponse {
         this.taskId = t.getTaskId();
         this.taskName = t.getTaskName();
         this.taskDetail = t.getTaskDetail();
+        this.taskDueDate = t.getTaskDueDate();
         this.taskStatus = t.getTaskStatus();
         this.taskProjectId = t.getTaskProject().getProjectId();
         this.taskComments = new ArrayList<>();

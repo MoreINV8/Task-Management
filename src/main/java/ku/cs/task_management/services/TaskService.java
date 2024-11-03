@@ -21,6 +21,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -57,6 +58,11 @@ public class TaskService {
         task.setTaskProject(projectRepository.findById(request.getTaskProjectId())
                 .orElseThrow(() -> new NotFoundProjectException(request.getTaskProjectId())));
         task.setTaskStatus(TaskStatus.TODO);
+        //set Date
+        if (request.getTaskDueDate() != null)
+            task.setTaskDueDate(request.getTaskDueDate());
+        else
+            task.setTaskDueDate(LocalDateTime.now());
 
         Task createdTask = taskRepository.save(task);
 

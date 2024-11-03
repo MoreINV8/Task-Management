@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import ku.cs.task_management.commons.TaskStatus;
 import lombok.Data;
 
+import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,6 +28,9 @@ public class Task {
 
     @Column(name = "task_status")
     private TaskStatus taskStatus;
+
+    @Column(name = "task_due_date")
+    private LocalDateTime taskDueDate;
 
     @JsonIgnore
     @ManyToOne
