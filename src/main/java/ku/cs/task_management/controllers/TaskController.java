@@ -60,7 +60,7 @@ public class TaskController {
 
     @PutMapping("/task/update-status")
     public ResponseEntity<TaskResponse> updateTaskStatus(@RequestParam UUID t, @RequestParam TaskStatus s)
-            throws NotFoundTaskException, InvalidRequestException {
+            throws NotFoundTaskException, NotFoundProjectException, NotFoundMemberException {
         return new ResponseEntity<>(taskService.changeTaskStatus(t, s), HttpStatus.OK);
     }
 
@@ -92,7 +92,7 @@ public class TaskController {
 
     @DeleteMapping("/task/delete")
     public ResponseEntity<TaskResponse> deleteTask(@RequestParam UUID t)
-            throws NotFoundTaskException, NotFoundCommentException, NotFoundParticipationException, NotFoundNotificationException {
+            throws NotFoundTaskException, NotFoundCommentException, NotFoundParticipationException, NotFoundNotificationException, NotFoundProjectException, NotFoundMemberException {
         return new ResponseEntity<>(taskService.deleteTask(t), HttpStatus.OK);
     }
 }

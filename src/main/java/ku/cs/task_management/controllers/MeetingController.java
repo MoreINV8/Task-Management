@@ -49,7 +49,7 @@ public class MeetingController {
 
     @DeleteMapping("meeting/delete")
     public ResponseEntity<MeetingResponse> deleteMeeting(@RequestBody MeetingRequest request)
-            throws NotFoundProjectException, NotFoundMeetingException, NotFoundNotificationException {
+            throws NotFoundProjectException, NotFoundMeetingException, NotFoundNotificationException, NotFoundMemberException {
         return new ResponseEntity<>(meetingService.deleteMeeting(request), HttpStatus.OK);
     }
 }

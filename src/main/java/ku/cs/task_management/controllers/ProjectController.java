@@ -54,7 +54,7 @@ public class ProjectController {
 
     @PostMapping("/project/create")
     public ResponseEntity<ProjectResponse> createProject(@RequestBody ProjectRequest projectCreateRequest)
-            throws NotFoundMemberException {
+            throws NotFoundMemberException, NotFoundProjectException {
         return new ResponseEntity<>(projectService.createProject(projectCreateRequest), HttpStatus.OK);
     }
 

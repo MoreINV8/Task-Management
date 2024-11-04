@@ -3,14 +3,12 @@ package ku.cs.task_management.services;
 import ku.cs.task_management.entities.Comment;
 import ku.cs.task_management.entities.Member;
 import ku.cs.task_management.entities.Task;
-import ku.cs.task_management.exceptions.CommentAuthorMismatchException;
-import ku.cs.task_management.exceptions.NotFoundCommentException;
-import ku.cs.task_management.exceptions.NotFoundMemberException;
-import ku.cs.task_management.exceptions.NotFoundTaskException;
+import ku.cs.task_management.exceptions.*;
 import ku.cs.task_management.repositories.CommentRepository;
 import ku.cs.task_management.repositories.MemberRepository;
 import ku.cs.task_management.repositories.TaskRepository;
 import ku.cs.task_management.requests.comment_requests.CommentRequest;
+import ku.cs.task_management.requests.log_request.LogRequest;
 import ku.cs.task_management.responses.CommentResponse;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +30,8 @@ public class CommentService {
     private ModelMapper modelMapper;
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private  LogService logService;
 
     public List<Comment> getAllComments() {
         return commentRepository.findAll();
@@ -49,7 +49,7 @@ public class CommentService {
     }
 
     public CommentResponse createComment(CommentRequest request)
-            throws NotFoundTaskException, NotFoundMemberException {
+            throws NotFoundTaskException, NotFoundMemberException, NotFoundProjectException {
 
         Comment comment = new Comment();
 
@@ -69,6 +69,11 @@ public class CommentService {
         comment.setCommentPostTime(Date.valueOf(currentTime));
 
         Comment createdComment = commentRepository.save(comment);
+
+        // add log
+        LogRequest logRequest = new LogRequest(member.getMemberId() + " have been added comment.", createdComment.getCommentTask().getTaskProject().getProjectId(), member.getMemberId());
+        logService.saveLog(logRequest);
+
         return modelMapper.map(createdComment, CommentResponse.class);
     }
 

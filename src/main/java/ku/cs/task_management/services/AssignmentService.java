@@ -15,6 +15,7 @@ import ku.cs.task_management.repositories.NotificationRepository;
 import ku.cs.task_management.repositories.ProjectRepository;
 import ku.cs.task_management.requests.assignment_requests.AssignRequest;
 import ku.cs.task_management.requests.assignment_requests.KickRequest;
+import ku.cs.task_management.requests.log_request.LogRequest;
 import ku.cs.task_management.responses.AssignResponse;
 import ku.cs.task_management.responses.MemberResponse;
 import ku.cs.task_management.responses.ProjectResponse;
@@ -47,6 +48,9 @@ public class AssignmentService {
 
     @Autowired
     private NotificationService notificationService;
+
+    @Autowired
+    private LogService logService;
 
     // TODO: return in List of Object or just return in List of UUID, which one is better
     public List<AssignResponse> getAllMembersByProjectId(UUID projectId)
@@ -84,6 +88,10 @@ public class AssignmentService {
             throw new NotFoundMemberException(request.getEmail());
         }
 
+        // add log
+        LogRequest logRequest = new LogRequest(member.getMemberId() + " have been added to project " + project.getProjectName(), project.getProjectId(), project.getProjectOwner().getMemberId());
+        logService.saveLog(logRequest);
+
         Assignment assignment = new Assignment();
         assignment.setId(new AssignmentKey(member.getMemberId(), projectId));
         assignment.setRole(request.getRole());
@@ -102,6 +110,10 @@ public class AssignmentService {
 
         Member member = memberRepository.findById(request.getMemberId())
                 .orElseThrow(() -> new NotFoundMemberException(request.getMemberId()));
+
+        // add log
+        LogRequest logRequest = new LogRequest(member.getDetail().getMemberName() + " have been kicked off project " + project.getProjectName(), project.getProjectId(), project.getProjectOwner().getMemberId());
+        logService.saveLog(logRequest);
 
         // remove notification from assignee
         List<Notification> notifications = notificationRepository.getNotificationsByReceiverId(member.getMemberId());

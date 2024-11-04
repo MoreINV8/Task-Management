@@ -5,6 +5,7 @@ import ku.cs.task_management.entities.*;
 import ku.cs.task_management.entities.keys.ParticipationKey;
 import ku.cs.task_management.exceptions.*;
 import ku.cs.task_management.repositories.*;
+import ku.cs.task_management.requests.log_request.LogRequest;
 import ku.cs.task_management.requests.task_requests.TaskCreateRequest;
 import ku.cs.task_management.requests.task_requests.TaskUpdateRequest;
 import ku.cs.task_management.responses.TaskResponse;
@@ -40,6 +41,8 @@ public class TaskService {
     private NotificationService notificationService;
     @Autowired
     private NotificationRepository notificationRepository;
+    @Autowired
+    private LogService logService;
 
     public List<TaskResponse> getAllTasks() {
         List<TaskResponse> responses = new ArrayList<>();
@@ -78,6 +81,10 @@ public class TaskService {
         participate.setMember(member);
         participationRepository.save(participate);
 
+        // add log
+        LogRequest logRequest = new LogRequest( "Task " + createdTask.getTaskName() + " have been created.", createdTask.getTaskProject().getProjectId(), createdTask.getTaskProject().getProjectOwner().getMemberId());
+        logService.saveLog(logRequest);
+
         return modelMapper.map(createdTask, TaskResponse.class);
     }
 
@@ -112,7 +119,7 @@ public class TaskService {
     }
 
     public TaskResponse deleteTask(UUID taskId)
-            throws NotFoundTaskException, NotFoundCommentException, NotFoundParticipationException, NotFoundNotificationException {
+            throws NotFoundTaskException, NotFoundCommentException, NotFoundParticipationException, NotFoundNotificationException, NotFoundProjectException, NotFoundMemberException {
 
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NotFoundTaskException(taskId));
@@ -140,6 +147,10 @@ public class TaskService {
             }
         }
 
+        // add log
+        LogRequest logRequest = new LogRequest("Task " + task.getTaskName() + " have been removed.", task.getTaskProject().getProjectId(), task.getTaskProject().getProjectOwner().getMemberId());
+        logService.saveLog(logRequest);
+
         taskRepository.delete(task);
 
         return modelMapper.map(task, TaskResponse.class);
@@ -162,10 +173,14 @@ public class TaskService {
 
     // Method to change task status
     public TaskResponse changeTaskStatus(UUID taskId, TaskStatus newStatus)
-            throws NotFoundTaskException {
+            throws NotFoundTaskException, NotFoundProjectException, NotFoundMemberException {
 
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NotFoundTaskException(taskId));
+
+        // add log
+        LogRequest logRequest = new LogRequest(task.getTaskName() + " have been updated.", task.getTaskProject().getProjectId(), task.getTaskProject().getProjectOwner().getMemberId());
+        logService.saveLog(logRequest);
 
         task.setTaskStatus(newStatus);
 

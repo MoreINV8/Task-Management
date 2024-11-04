@@ -9,6 +9,7 @@ import ku.cs.task_management.repositories.AssignmentRepository;
 import ku.cs.task_management.repositories.MeetingRepository;
 import ku.cs.task_management.repositories.NotificationRepository;
 import ku.cs.task_management.repositories.ProjectRepository;
+import ku.cs.task_management.requests.log_request.LogRequest;
 import ku.cs.task_management.requests.meeting_requests.MeetingCreateRequest;
 import ku.cs.task_management.requests.meeting_requests.MeetingRequest;
 import ku.cs.task_management.requests.notification_requests.NotificationSendRequest;
@@ -35,6 +36,8 @@ public class MeetingService {
     private NotificationService notificationService;
     @Autowired
     private NotificationRepository notificationRepository;
+    @Autowired
+    private LogService logService;
 
     public List<Meeting> getAllMeetings() {
         return meetingRepository.findAll();
@@ -66,6 +69,10 @@ public class MeetingService {
                 .orElseThrow(() -> new NotFoundProjectException(request.getMeetingProjectId())));
 
         Meeting createdMeeting = meetingRepository.save(meeting);
+
+        // add log
+        LogRequest logRequest = new LogRequest("Meeting " + createdMeeting.getMeetingTopic() + " will start at " + createdMeeting.getMeetingDate().toString(), createdMeeting.getMeetingProject().getProjectId(), createdMeeting.getMeetingProject().getProjectOwner().getMemberId());
+        logService.saveLog(logRequest);
 
         // send notification to all member in project
         for (Assignment assignment : assignmentRepository.findAllByProjectProjectId(createdMeeting.getMeetingProject().getProjectId())) {
@@ -100,7 +107,7 @@ public class MeetingService {
     }
 
     public MeetingResponse deleteMeeting(MeetingRequest request)
-            throws NotFoundMeetingException, NotFoundProjectException, NotFoundNotificationException {
+            throws NotFoundMeetingException, NotFoundProjectException, NotFoundNotificationException, NotFoundMemberException {
 
         Project project = projectRepository.findById(request.getMeetingProjectId())
                 .orElseThrow(() -> new NotFoundProjectException(request.getMeetingProjectId()));
@@ -108,6 +115,10 @@ public class MeetingService {
                 .filter(m -> m.getMeetingId().equals(request.getMeetingId()))
                 .findFirst()
                 .orElseThrow(() -> new NotFoundMeetingException(request.getMeetingId()));
+
+        // add log
+        LogRequest logRequest = new LogRequest(meeting.getMeetingTopic() + " have been removed.", project.getProjectId(), project.getProjectOwner().getMemberId());
+        logService.saveLog(logRequest);
 
         // remove notification
         List<Notification> notifications = notificationRepository.findNotificationsByNotificationMeetingMeetingId(request.getMeetingId());

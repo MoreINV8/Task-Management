@@ -9,6 +9,7 @@ import ku.cs.task_management.exceptions.NotFoundProjectException;
 import ku.cs.task_management.exceptions.NotProjectOwnerException;
 import ku.cs.task_management.repositories.MemberRepository;
 import ku.cs.task_management.repositories.ProjectRepository;
+import ku.cs.task_management.requests.log_request.LogRequest;
 import ku.cs.task_management.requests.project_requests.ProjectFavourRequest;
 import ku.cs.task_management.requests.project_requests.ProjectRequest;
 import ku.cs.task_management.responses.ProjectResponse;
@@ -33,6 +34,9 @@ public class ProjectService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private LogService logService;
 
     public List<Project> getAllProjects() {
         return projectRepository.findAll();
@@ -69,7 +73,7 @@ public class ProjectService {
 
     // Create a new project
     public ProjectResponse createProject(ProjectRequest request)
-            throws NotFoundMemberException {
+            throws NotFoundMemberException, NotFoundProjectException {
 
         //TODO: need to recheck again about the exception
         Member member = memberRepository.findById(request.getProjectOwnerId())
@@ -86,6 +90,10 @@ public class ProjectService {
         project.setProjectImg("?");
 
         Project createdProject = projectRepository.save(project);
+
+        // add log
+        LogRequest logRequest = new LogRequest("Project Created", createdProject.getProjectId(), member.getMemberId());
+        logService.saveLog(logRequest);
         return modelMapper.map(createdProject, ProjectResponse.class);
     }
 
