@@ -37,7 +37,9 @@ public class CommentService {
         return commentRepository.findAll();
     }
 
-    public List<CommentResponse> getAllCommentByTaskId(UUID taskId) throws NotFoundTaskException {
+    public List<CommentResponse> getAllCommentByTaskId(UUID taskId)
+            throws NotFoundTaskException {
+
         taskRepository.findById(taskId).orElseThrow(() -> new NotFoundTaskException(taskId));
         List<CommentResponse> responses = new ArrayList<>();
         for (Comment comment : commentRepository.findAllByCommentTaskTaskId(taskId)) {
@@ -46,7 +48,9 @@ public class CommentService {
         return responses;
     }
 
-    public CommentResponse createComment(CommentRequest request) throws NotFoundTaskException, NotFoundMemberException {
+    public CommentResponse createComment(CommentRequest request)
+            throws NotFoundTaskException, NotFoundMemberException {
+
         Comment comment = new Comment();
 
         Member member = memberRepository.findById(request.getCommentMemberId())
@@ -68,7 +72,9 @@ public class CommentService {
         return modelMapper.map(createdComment, CommentResponse.class);
     }
 
-    public CommentResponse editComment(CommentRequest request) throws NotFoundTaskException, NotFoundCommentException, CommentAuthorMismatchException {
+    public CommentResponse editComment(CommentRequest request)
+            throws NotFoundTaskException, NotFoundCommentException, CommentAuthorMismatchException {
+
         // check if task is exist
         taskRepository
                 .findById(request.getCommentTaskId())
@@ -92,23 +98,20 @@ public class CommentService {
         return modelMapper.map(updatedComment, CommentResponse.class);
     }
 
-    public CommentResponse deleteComment(CommentRequest request) throws NotFoundTaskException, NotFoundCommentException, CommentAuthorMismatchException {
-        // check if task is exist
-        Task task = taskRepository
-                .findById(request.getCommentTaskId())
-                .orElseThrow(() -> new NotFoundTaskException(request.getCommentTaskId()));
+    public CommentResponse deleteComment(UUID commentId)
+            throws NotFoundCommentException {
 
+        // check if task is exist
         Comment comment = commentRepository
-                .findById(request.getCommentId())
-                .orElseThrow(() -> new NotFoundCommentException(request.getCommentId()));
+                .findById(commentId)
+                .orElseThrow(() -> new NotFoundCommentException(commentId));
 
         // check if Member is not
-        if (!comment.getCommentAuthor().getMemberId().equals(request.getCommentMemberId())) {
-            throw new CommentAuthorMismatchException(comment.getCommentAuthor(), request.getCommentMemberId());
-        }
 
-        task.getTaskComments().remove(comment);
-        taskRepository.save(task);
+        comment.setCommentAuthor(null);
+        comment.setCommentTask(null);
+
+        commentRepository.save(comment);
 
         commentRepository.delete(comment);
         return modelMapper.map(comment, CommentResponse.class);

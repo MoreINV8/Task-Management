@@ -40,7 +40,8 @@ public class ProjectController {
     }
 
     @GetMapping("/project/{email}")
-    public ResponseEntity<List<ProjectResponse>> getAllMyProject(@PathVariable String email) throws NotFoundMemberException {
+    public ResponseEntity<List<ProjectResponse>> getAllMyProject(@PathVariable String email)
+            throws NotFoundMemberException {
         return new ResponseEntity<>(projectService.getAllProjectsByOwnerEmail(email), HttpStatus.OK);
     }
 
@@ -52,19 +53,22 @@ public class ProjectController {
     }
 
     @PostMapping("/project/create")
-    public ResponseEntity<ProjectResponse> createProject(@RequestBody ProjectRequest projectCreateRequest) throws NotFoundMemberException {
-        return new ResponseEntity<>(projectService.createProject(projectCreateRequest), HttpStatus.CREATED);
+    public ResponseEntity<ProjectResponse> createProject(@RequestBody ProjectRequest projectCreateRequest)
+            throws NotFoundMemberException {
+        return new ResponseEntity<>(projectService.createProject(projectCreateRequest), HttpStatus.OK);
     }
 
     // assignment GET
     @GetMapping("/{projectId}/assignment")
-    public ResponseEntity<List<AssignResponse>> getAllMembersByProjectId(@PathVariable UUID projectId) throws NotFoundProjectException {
+    public ResponseEntity<List<AssignResponse>> getAllMembersByProjectId(@PathVariable UUID projectId)
+            throws NotFoundProjectException {
         return new ResponseEntity<>(assignmentService.getAllMembersByProjectId(projectId), HttpStatus.OK);
     }
 
     // assignment POST
     @PostMapping("/{projectId}/assign")
-    public ResponseEntity<SuccessResponse> assignMember(@PathVariable UUID projectId, @RequestBody AssignRequest request) throws NotFoundProjectException, NotFoundMemberException, NotFoundTaskException, NotFoundMeetingException, InvalidRequestException {
+    public ResponseEntity<SuccessResponse> assignMember(@PathVariable UUID projectId, @RequestBody AssignRequest request)
+            throws NotFoundProjectException, NotFoundMemberException, NotFoundTaskException, NotFoundMeetingException, InvalidRequestException {
         // and notification to added member
         notificationService.insertNotification(NotificationSendRequest.project(projectId), request.getEmail());
 
@@ -73,12 +77,14 @@ public class ProjectController {
 
     // assignment DELETE
     @DeleteMapping("/{projectId}/unassign")
-    public ResponseEntity<SuccessResponse> unassignMember(@PathVariable UUID projectId, @RequestBody KickRequest request) throws NotFoundProjectException, NotFoundMemberException, NotFoundAssignmentException {
+    public ResponseEntity<SuccessResponse> unassignMember(@PathVariable UUID projectId, @RequestBody KickRequest request)
+            throws NotFoundProjectException, NotFoundMemberException, NotFoundAssignmentException {
         return new ResponseEntity<>(assignmentService.unassign(projectId, request), HttpStatus.OK);
     }
 
     @PutMapping("/project/update-favour")
-    public ResponseEntity<SuccessResponse> updateFavour(@RequestBody ProjectFavourRequest request) throws NotFoundProjectException, InvalidRequestException {
+    public ResponseEntity<SuccessResponse> updateFavour(@RequestBody ProjectFavourRequest request)
+            throws NotFoundProjectException, InvalidRequestException {
         return new ResponseEntity<>(projectService.updateProjectFavour(request), HttpStatus.OK);
     }
     @PutMapping("/project/{email}/{projectId}/edit")

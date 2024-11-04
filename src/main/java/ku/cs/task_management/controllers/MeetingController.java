@@ -25,26 +25,31 @@ public class MeetingController {
     }
 
     @GetMapping("{projectId}/meeting")
-    public ResponseEntity<List<MeetingResponse>> getMeetings(@PathVariable UUID projectId) throws NotFoundProjectException {
+    public ResponseEntity<List<MeetingResponse>> getMeetings(@PathVariable UUID projectId)
+            throws NotFoundProjectException {
         return new ResponseEntity<>(meetingService.getAllMeetingByProject(projectId), HttpStatus.OK);
     }
 
     @GetMapping("{projectId}/{meetingId}/detail")
-    public ResponseEntity<MeetingResponse> getMeetingDetail(@RequestBody MeetingRequest request) throws NotFoundMeetingException, NotFoundProjectException {
+    public ResponseEntity<MeetingResponse> getMeetingDetail(@RequestBody MeetingRequest request)
+            throws NotFoundMeetingException, NotFoundProjectException {
         return new ResponseEntity<>(meetingService.getMeetingDetail(request), HttpStatus.OK);
     }
     @PostMapping("meeting/create")
-    public ResponseEntity<MeetingResponse> createMeeting(@RequestBody MeetingCreateRequest request) throws NotFoundProjectException, NotFoundTaskException, NotFoundMeetingException, InvalidRequestException, NotFoundMemberException {
-        return new ResponseEntity<>(meetingService.createMeeting(request), HttpStatus.CREATED);
+    public ResponseEntity<MeetingResponse> createMeeting(@RequestBody MeetingCreateRequest request)
+            throws NotFoundProjectException, NotFoundTaskException, NotFoundMeetingException, InvalidRequestException, NotFoundMemberException {
+        return new ResponseEntity<>(meetingService.createMeeting(request), HttpStatus.OK);
     }
 
     @PutMapping("meeting/edit")
-    public ResponseEntity<MeetingResponse> editMeeting(@RequestBody MeetingRequest request) throws NotFoundProjectException, NotFoundMeetingException {
+    public ResponseEntity<MeetingResponse> editMeeting(@RequestBody MeetingRequest request)
+            throws NotFoundProjectException, NotFoundMeetingException {
         return new ResponseEntity<>(meetingService.updateMeeting(request), HttpStatus.OK);
     }
 
     @DeleteMapping("meeting/delete")
-    public ResponseEntity<MeetingResponse> deleteMeeting(@RequestBody MeetingRequest request) throws NotFoundProjectException, NotFoundMeetingException {
+    public ResponseEntity<MeetingResponse> deleteMeeting(@RequestBody MeetingRequest request)
+            throws NotFoundProjectException, NotFoundMeetingException, NotFoundNotificationException {
         return new ResponseEntity<>(meetingService.deleteMeeting(request), HttpStatus.OK);
     }
 }

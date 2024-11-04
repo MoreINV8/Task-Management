@@ -61,16 +61,20 @@ public class NotificationService {
         return getResponse(notificationRepository.save(notification));
     }
 
-    public NotificationResponse insertNotification(NotificationSendRequest request, UUID receiverId) throws NotFoundTaskException, NotFoundProjectException, NotFoundMeetingException, InvalidRequestException, NotFoundMemberException {
+    public void insertNotification(NotificationSendRequest request, UUID receiverId)
+            throws NotFoundTaskException, NotFoundProjectException, NotFoundMeetingException, InvalidRequestException, NotFoundMemberException {
+
         Member receiver = memberRepository.findById(receiverId)
                 .orElseThrow(() -> new NotFoundMemberException(receiverId));
 
         request.setReceiver(receiver);
 
-        return insertNotification(request);
+        insertNotification(request);
     }
 
-    public NotificationResponse insertNotification(NotificationSendRequest request, String email) throws NotFoundTaskException, NotFoundProjectException, NotFoundMeetingException, InvalidRequestException, NotFoundMemberException {
+    public void insertNotification(NotificationSendRequest request, String email)
+            throws NotFoundTaskException, NotFoundProjectException, NotFoundMeetingException, InvalidRequestException, NotFoundMemberException {
+
         Member receiver = memberRepository.findMemberByEmail(email);
 
         if (receiver == null) {
@@ -79,7 +83,7 @@ public class NotificationService {
 
         request.setReceiver(receiver);
 
-        return insertNotification(request);
+        insertNotification(request);
     }
 
     public List<NotificationResponse> getNotificationFromMemberId(UUID mId)
@@ -141,7 +145,10 @@ public class NotificationService {
 
         if (notification.getNotificationProject() != null) {
             response.setType(NotificationType.PROJECT);
-            response.setProject(new ProjectResponse(notification.getNotificationProject()));
+            ProjectResponse projectResponse = new ProjectResponse(notification.getNotificationProject());
+            projectResponse.setProjectOwner(modelMapper.map(notification.getNotificationProject().getProjectOwner(), MemberResponse.class));
+
+            response.setProject(projectResponse);
         }
         if (notification.getNotificationTask() != null) {
             response.setType(NotificationType.TASK);

@@ -17,7 +17,7 @@ public class ProjectResponse {
     private String projectDescription;
     private Date projectDeadline;
     private ProjectStatus projectFav;
-    private UUID projectOwnerId;
+    private MemberResponse projectOwner;
     private String projectImg;
 
     public ProjectResponse(Project p) {
@@ -26,7 +26,6 @@ public class ProjectResponse {
         projectDescription = p.getProjectDescription();
         projectDeadline = p.getProjectDeadline();
         projectFav = p.getProjectFav();
-        projectOwnerId = p.getProjectOwner().getMemberId();
         projectImg = p.getProjectImg();
     }
 }

@@ -27,22 +27,26 @@ public class CommentController {
     }
 
     @GetMapping("{taskId}/comment")
-    public ResponseEntity<List<CommentResponse>> getCommentsByTaskId(@PathVariable UUID taskId) throws NotFoundTaskException {
+    public ResponseEntity<List<CommentResponse>> getCommentsByTaskId(@PathVariable UUID taskId)
+            throws NotFoundTaskException {
         return new ResponseEntity<>(commentService.getAllCommentByTaskId(taskId), HttpStatus.OK);
     }
 
     @PostMapping("/comment/create")
-    public ResponseEntity<CommentResponse> createComment(@RequestBody CommentRequest request) throws NotFoundTaskException, NotFoundMemberException {
-        return new ResponseEntity<>(commentService.createComment(request), HttpStatus.CREATED);
+    public ResponseEntity<CommentResponse> createComment(@RequestBody CommentRequest request)
+            throws NotFoundTaskException, NotFoundMemberException {
+        return new ResponseEntity<>(commentService.createComment(request), HttpStatus.OK);
     }
 
     @PutMapping("/comment/edit")
-    public ResponseEntity<CommentResponse> editComment(@RequestBody CommentRequest request) throws NotFoundTaskException, NotFoundCommentException, CommentAuthorMismatchException {
+    public ResponseEntity<CommentResponse> editComment(@RequestBody CommentRequest request)
+            throws NotFoundTaskException, NotFoundCommentException, CommentAuthorMismatchException {
         return new ResponseEntity<>(commentService.editComment(request), HttpStatus.OK);
     }
 
     @DeleteMapping("/comment/delete")
-    public ResponseEntity<CommentResponse> deleteComment(@RequestBody CommentRequest request) throws NotFoundTaskException, NotFoundCommentException, CommentAuthorMismatchException {
-        return new ResponseEntity<>(commentService.deleteComment(request), HttpStatus.OK);
+    public ResponseEntity<CommentResponse> deleteComment(@RequestBody CommentRequest request)
+            throws NotFoundCommentException {
+        return new ResponseEntity<>(commentService.deleteComment(request.getCommentId()), HttpStatus.OK);
     }
 }

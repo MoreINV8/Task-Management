@@ -39,9 +39,6 @@ public class MemberService implements UserDetailsService {
     private MemberRepository memberRepository;
 
     @Autowired
-    private ProjectRepository projectRepository;
-
-    @Autowired
     private MemberDetailRepository memberDetailRepository;
 
     @Autowired
@@ -53,6 +50,7 @@ public class MemberService implements UserDetailsService {
 
     public MemberResponse getLoginMember(MemberLoginRequest request)
             throws NotFoundMemberException, WrongPasswordException {
+
         // check user was existed
         Member member = memberRepository.findMemberByEmail(request.getMemberEmail());
         if (member == null) {
@@ -70,7 +68,9 @@ public class MemberService implements UserDetailsService {
         return response;
     }
 
-    public MemberResponse getMemberById(UUID memberId) throws NotFoundMemberException {
+    public MemberResponse getMemberById(UUID memberId)
+            throws NotFoundMemberException {
+
         if (!memberRepository.existsById(memberId)) {
             throw new NotFoundMemberException(memberId);
         }
@@ -80,6 +80,7 @@ public class MemberService implements UserDetailsService {
 
     public MemberResponse registerMember(MemberSignupRequest request)
             throws UnavailableEmailException {
+
         // check if email was used
         if (memberRepository.findMemberByEmail(request.getMemberEmail()) != null) {
             throw new UnavailableEmailException(request.getMemberEmail());
@@ -101,6 +102,7 @@ public class MemberService implements UserDetailsService {
 
     public MemberResponse updateMemberDetail(MemberEditProfileRequest request)
             throws UnavailableEmailException, NotFoundMemberException {
+
         // check if member account excise
         Member member = memberRepository.findById(request.getMemberId())
                 .orElseThrow(() -> new NotFoundMemberException(request.getMemberId()));
@@ -161,7 +163,8 @@ public class MemberService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String email)
+            throws UsernameNotFoundException {
 
         Member member = memberRepository.findMemberByEmail(email);
 

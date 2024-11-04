@@ -19,19 +19,20 @@ public class MemberController {
     private MemberService memberService;
 
     @GetMapping("/member")
-    public ResponseEntity<MemberResponse> getMemberById(@RequestParam UUID m) throws NotFoundMemberException {
+    public ResponseEntity<MemberResponse> getMemberById(@RequestParam UUID m)
+            throws NotFoundMemberException {
         return ResponseEntity.ok(memberService.getMemberById(m));
     }
 
     @PutMapping("/member/edit-profile")
     public ResponseEntity<MemberResponse> editMemberProfile(@RequestBody MemberEditProfileRequest request)
             throws NotFoundMemberException, UnavailableEmailException {
-        return new ResponseEntity<>(memberService.updateMemberDetail(request), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(memberService.updateMemberDetail(request), HttpStatus.OK);
     }
 
     @PutMapping("/member/edit-password")
     public ResponseEntity<MemberResponse> editMemberPassword(@RequestBody MemberEditPasswordRequest request)
             throws NotFoundMemberException, WrongPasswordException, SamePasswordException {
-        return new ResponseEntity<>(memberService.updateMemberPassword(request), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(memberService.updateMemberPassword(request), HttpStatus.OK);
     }
 }

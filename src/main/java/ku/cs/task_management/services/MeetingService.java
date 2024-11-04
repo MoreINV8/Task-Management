@@ -2,10 +2,12 @@ package ku.cs.task_management.services;
 
 import ku.cs.task_management.entities.Assignment;
 import ku.cs.task_management.entities.Meeting;
+import ku.cs.task_management.entities.Notification;
 import ku.cs.task_management.entities.Project;
 import ku.cs.task_management.exceptions.*;
 import ku.cs.task_management.repositories.AssignmentRepository;
 import ku.cs.task_management.repositories.MeetingRepository;
+import ku.cs.task_management.repositories.NotificationRepository;
 import ku.cs.task_management.repositories.ProjectRepository;
 import ku.cs.task_management.requests.meeting_requests.MeetingCreateRequest;
 import ku.cs.task_management.requests.meeting_requests.MeetingRequest;
@@ -31,12 +33,16 @@ public class MeetingService {
     private ModelMapper modelMapper;
     @Autowired
     private NotificationService notificationService;
+    @Autowired
+    private NotificationRepository notificationRepository;
 
     public List<Meeting> getAllMeetings() {
         return meetingRepository.findAll();
     }
 
-    public List<MeetingResponse> getAllMeetingByProject(UUID projectId) throws NotFoundProjectException {
+    public List<MeetingResponse> getAllMeetingByProject(UUID projectId)
+            throws NotFoundProjectException {
+
         List<MeetingResponse> responses = new ArrayList<>();
 
         projectRepository.findById(projectId)
@@ -48,7 +54,9 @@ public class MeetingService {
         return responses;
     }
 
-    public MeetingResponse createMeeting(MeetingCreateRequest request) throws NotFoundProjectException, NotFoundTaskException, NotFoundMeetingException, InvalidRequestException, NotFoundMemberException {
+    public MeetingResponse createMeeting(MeetingCreateRequest request)
+            throws NotFoundProjectException, NotFoundTaskException, NotFoundMeetingException, InvalidRequestException, NotFoundMemberException {
+
         Meeting meeting = new Meeting();
 
         meeting.setMeetingTopic(request.getMeetingTopic());
@@ -67,7 +75,9 @@ public class MeetingService {
         return modelMapper.map(createdMeeting, MeetingResponse.class);
     }
 
-    public MeetingResponse getMeetingDetail (MeetingRequest request) throws NotFoundMeetingException, NotFoundProjectException {
+    public MeetingResponse getMeetingDetail (MeetingRequest request)
+            throws NotFoundMeetingException, NotFoundProjectException {
+
         Meeting meeting = meetingRepository.findById(request.getMeetingId())
                 .orElseThrow(() -> new NotFoundMeetingException(request.getMeetingId()));
         projectRepository.findById(request.getMeetingProjectId())
@@ -89,13 +99,23 @@ public class MeetingService {
         return modelMapper.map(updatedMeeting, MeetingResponse.class);
     }
 
-    public MeetingResponse deleteMeeting(MeetingRequest request) throws NotFoundMeetingException, NotFoundProjectException {
+    public MeetingResponse deleteMeeting(MeetingRequest request)
+            throws NotFoundMeetingException, NotFoundProjectException, NotFoundNotificationException {
+
         Project project = projectRepository.findById(request.getMeetingProjectId())
                 .orElseThrow(() -> new NotFoundProjectException(request.getMeetingProjectId()));
         Meeting meeting = project.getProjectMeetings().stream()
                 .filter(m -> m.getMeetingId().equals(request.getMeetingId()))
                 .findFirst()
                 .orElseThrow(() -> new NotFoundMeetingException(request.getMeetingId()));
+
+        // remove notification
+        List<Notification> notifications = notificationRepository.findNotificationsByNotificationMeetingMeetingId(request.getMeetingId());
+        if (notifications != null) {
+            for (Notification n : notifications) {
+                notificationService.deleteNotification(n.getNotificationId());
+            }
+        }
 
         project.getProjectMeetings().remove(meeting);
         projectRepository.save(project);
