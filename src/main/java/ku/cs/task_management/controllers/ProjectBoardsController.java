@@ -22,7 +22,7 @@ public class ProjectBoardsController {
     private AssignmentService assignmentService;
 
     @GetMapping("/project-boards")
-    public ResponseEntity<ProjectListResponse> projectList(@RequestParam UUID m)
+    public ResponseEntity<ProjectListResponse> projectBoard(@RequestParam UUID m)
             throws NotFoundMemberException {
         return ResponseEntity.ok(
                 new ProjectListResponse(
