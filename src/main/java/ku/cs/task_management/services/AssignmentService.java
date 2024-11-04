@@ -2,13 +2,16 @@ package ku.cs.task_management.services;
 
 import ku.cs.task_management.entities.Assignment;
 import ku.cs.task_management.entities.Member;
+import ku.cs.task_management.entities.Notification;
 import ku.cs.task_management.entities.Project;
 import ku.cs.task_management.entities.keys.AssignmentKey;
 import ku.cs.task_management.exceptions.NotFoundAssignmentException;
 import ku.cs.task_management.exceptions.NotFoundMemberException;
+import ku.cs.task_management.exceptions.NotFoundNotificationException;
 import ku.cs.task_management.exceptions.NotFoundProjectException;
 import ku.cs.task_management.repositories.AssignmentRepository;
 import ku.cs.task_management.repositories.MemberRepository;
+import ku.cs.task_management.repositories.NotificationRepository;
 import ku.cs.task_management.repositories.ProjectRepository;
 import ku.cs.task_management.requests.assignment_requests.AssignRequest;
 import ku.cs.task_management.requests.assignment_requests.KickRequest;
@@ -38,6 +41,12 @@ public class AssignmentService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private NotificationRepository notificationRepository;
+
+    @Autowired
+    private NotificationService notificationService;
 
     // TODO: return in List of Object or just return in List of UUID, which one is better
     public List<AssignResponse> getAllMembersByProjectId(UUID projectId)
@@ -86,13 +95,21 @@ public class AssignmentService {
     }
 
     public SuccessResponse unassign(UUID projectId, KickRequest request)
-            throws NotFoundProjectException, NotFoundMemberException, NotFoundAssignmentException {
+            throws NotFoundProjectException, NotFoundMemberException, NotFoundAssignmentException, NotFoundNotificationException {
 
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new NotFoundProjectException(projectId));
 
         Member member = memberRepository.findById(request.getMemberId())
                 .orElseThrow(() -> new NotFoundMemberException(request.getMemberId()));
+
+        // remove notification from assignee
+        List<Notification> notifications = notificationRepository.getNotificationsByReceiverId(member.getMemberId());
+        if (notifications != null) {
+            for (Notification n : notifications) {
+                notificationService.deleteNotification(n.getNotificationId());
+            }
+        }
 
         AssignmentKey assignmentKey = new AssignmentKey(request.getMemberId(), projectId);
         Assignment assignment = assignmentRepository

@@ -78,7 +78,7 @@ public class ProjectController {
     // assignment DELETE
     @DeleteMapping("/{projectId}/unassign")
     public ResponseEntity<SuccessResponse> unassignMember(@PathVariable UUID projectId, @RequestBody KickRequest request)
-            throws NotFoundProjectException, NotFoundMemberException, NotFoundAssignmentException {
+            throws NotFoundProjectException, NotFoundMemberException, NotFoundAssignmentException, NotFoundNotificationException {
         return new ResponseEntity<>(assignmentService.unassign(projectId, request), HttpStatus.OK);
     }
 
