@@ -7,3 +7,4 @@ public class NotFoundNotificationException extends Exception {
         super("could not find notification with id '" + notificationId + "'");
     }
 }
+

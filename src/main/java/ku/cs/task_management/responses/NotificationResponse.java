@@ -13,7 +13,6 @@ public class NotificationResponse {
     private UUID notificationId;
 
     private LocalDateTime notificationTime;
-    private String notificationDetail;
 
     private NotificationStatus notificationStatus;
 

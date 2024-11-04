@@ -8,6 +8,8 @@ import ku.cs.task_management.exceptions.*;
 import ku.cs.task_management.repositories.*;
 import ku.cs.task_management.requests.notification_requests.NotificationSendRequest;
 import ku.cs.task_management.responses.*;
+import ku.cs.task_management.utils.NotificationHandler;
+import ku.cs.task_management.utils.NotificationHandlerFactory;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -46,21 +48,9 @@ public class NotificationService {
         Notification notification = new Notification();
 
         // check type
-        switch (request.getType()) {
-            case PROJECT -> notification.setNotificationProject(
-                    projectRepository.findById(request.getObjectId())
-                            .orElseThrow(() -> new NotFoundProjectException(request.getObjectId()))
-            );
-            case TASK -> notification.setNotificationTask(
-                    taskRepository.findById(request.getObjectId())
-                            .orElseThrow(() -> new NotFoundTaskException(request.getObjectId()))
-            );
-            case MEETING -> notification.setNotificationMeeting(
-                    meetingRepository.findById(request.getObjectId())
-                            .orElseThrow(() -> new NotFoundMeetingException(request.getObjectId()))
-            );
-            default -> throw new InvalidRequestException();
-        }
+        NotificationHandlerFactory handlerFactory = new NotificationHandlerFactory(projectRepository, taskRepository, meetingRepository);
+        NotificationHandler handler = handlerFactory.getHandler(request.getType());
+        handler.handle(notification, request.getObjectId());
 
         // set value
         notification.setNotificationTime(LocalDateTime.now());

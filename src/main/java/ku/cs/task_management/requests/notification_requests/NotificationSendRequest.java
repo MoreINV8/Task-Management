@@ -9,8 +9,6 @@ import java.util.UUID;
 
 @Data
 public class NotificationSendRequest {
-    private String notificationDetail;
-
     private NotificationType type;
 
     private UUID objectId;

@@ -55,11 +55,9 @@ public class AssignmentService {
 
     public List<ProjectResponse> getAllProjectByMemberId(UUID memberId) {
         List<ProjectResponse> responses = new ArrayList<>();
-
         for (Assignment assignment:assignmentRepository.findAllByMemberMemberId(memberId)) {
             responses.add(new ProjectResponse(assignment.getProject()));
         }
-
         return responses;
     }
 

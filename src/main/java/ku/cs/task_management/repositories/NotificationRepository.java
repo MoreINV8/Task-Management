@@ -17,3 +17,5 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
     )
     public List<Notification> getNotificationsByReceiverId(@Param("id") UUID receiveId);
 }
+
+
