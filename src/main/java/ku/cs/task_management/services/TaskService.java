@@ -1,19 +1,10 @@
 package ku.cs.task_management.services;
 
 import ku.cs.task_management.commons.TaskStatus;
-import ku.cs.task_management.entities.Member;
-import ku.cs.task_management.entities.Participation;
-import ku.cs.task_management.entities.Project;
-import ku.cs.task_management.entities.Task;
+import ku.cs.task_management.entities.*;
 import ku.cs.task_management.entities.keys.ParticipationKey;
-import ku.cs.task_management.exceptions.InvalidRequestException;
-import ku.cs.task_management.exceptions.NotFoundMemberException;
-import ku.cs.task_management.exceptions.NotFoundProjectException;
-import ku.cs.task_management.exceptions.NotFoundTaskException;
-import ku.cs.task_management.repositories.MemberRepository;
-import ku.cs.task_management.repositories.ParticipationRepository;
-import ku.cs.task_management.repositories.ProjectRepository;
-import ku.cs.task_management.repositories.TaskRepository;
+import ku.cs.task_management.exceptions.*;
+import ku.cs.task_management.repositories.*;
 import ku.cs.task_management.requests.task_requests.TaskCreateRequest;
 import ku.cs.task_management.requests.task_requests.TaskUpdateRequest;
 import ku.cs.task_management.responses.TaskResponse;
@@ -39,6 +30,16 @@ public class TaskService {
     private MemberRepository memberRepository;
     @Autowired
     private ParticipationRepository participationRepository;
+    @Autowired
+    private CommentService commentService;
+    @Autowired
+    private CommentRepository commentRepository;
+    @Autowired
+    private ParticipateService participateService;
+    @Autowired
+    private NotificationService notificationService;
+    @Autowired
+    private NotificationRepository notificationRepository;
 
     public List<TaskResponse> getAllTasks() {
         List<TaskResponse> responses = new ArrayList<>();
@@ -110,21 +111,34 @@ public class TaskService {
         return modelMapper.map(updatedTask, TaskResponse.class);
     }
 
-    public TaskResponse deleteTask(UUID projectId, UUID taskId)
-            throws NotFoundProjectException, NotFoundTaskException {
+    public TaskResponse deleteTask(UUID taskId)
+            throws NotFoundTaskException, NotFoundCommentException, NotFoundParticipationException, NotFoundNotificationException {
 
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new NotFoundProjectException(projectId));
-
-        // find the task within the project
-        Task task = project.getProjectTasks().stream()
-                .filter(t -> t.getTaskId().equals(taskId))
-                .findFirst()
+        Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NotFoundTaskException(taskId));
 
+        // remove comment from task
+        List<Comment> comments = commentRepository.findAllByCommentTaskTaskId(task.getTaskId());
+        if (comments != null) {
+            for (Comment c : comments) {
+                commentService.deleteComment(c.getCommentId());
+            }
+        }
+
         // remove the task from the project
-        project.getProjectTasks().remove(task);
-        projectRepository.save(project);
+        task.setTaskProject(null);
+        taskRepository.save(task);
+
+        // remove participation
+        participateService.removeParticipation(task.getTaskId());
+
+        // remove notification
+        List<Notification> notifications = notificationRepository.findNotificationsByNotificationTaskTaskId(task.getTaskId());
+        if (notifications != null) {
+            for (Notification n : notifications) {
+                notificationService.deleteNotification(n.getNotificationId());
+            }
+        }
 
         taskRepository.delete(task);
 

@@ -98,25 +98,20 @@ public class CommentService {
         return modelMapper.map(updatedComment, CommentResponse.class);
     }
 
-    public CommentResponse deleteComment(CommentRequest request)
-            throws NotFoundTaskException, NotFoundCommentException, CommentAuthorMismatchException {
+    public CommentResponse deleteComment(UUID commentId)
+            throws NotFoundCommentException {
 
         // check if task is exist
-        Task task = taskRepository
-                .findById(request.getCommentTaskId())
-                .orElseThrow(() -> new NotFoundTaskException(request.getCommentTaskId()));
-
         Comment comment = commentRepository
-                .findById(request.getCommentId())
-                .orElseThrow(() -> new NotFoundCommentException(request.getCommentId()));
+                .findById(commentId)
+                .orElseThrow(() -> new NotFoundCommentException(commentId));
 
         // check if Member is not
-        if (!comment.getCommentAuthor().getMemberId().equals(request.getCommentMemberId())) {
-            throw new CommentAuthorMismatchException(comment.getCommentAuthor(), request.getCommentMemberId());
-        }
 
-        task.getTaskComments().remove(comment);
-        taskRepository.save(task);
+        comment.setCommentAuthor(null);
+        comment.setCommentTask(null);
+
+        commentRepository.save(comment);
 
         commentRepository.delete(comment);
         return modelMapper.map(comment, CommentResponse.class);

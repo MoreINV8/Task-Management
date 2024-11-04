@@ -91,8 +91,8 @@ public class TaskController {
     }
 
     @DeleteMapping("/task/delete")
-    public ResponseEntity<TaskResponse> deleteTask(@RequestParam UUID p, @RequestParam UUID t)
-            throws NotFoundProjectException, NotFoundTaskException {
-        return new ResponseEntity<>(taskService.deleteTask(p, t), HttpStatus.OK);
+    public ResponseEntity<TaskResponse> deleteTask(@RequestParam UUID t)
+            throws NotFoundTaskException, NotFoundCommentException, NotFoundParticipationException, NotFoundNotificationException {
+        return new ResponseEntity<>(taskService.deleteTask(t), HttpStatus.OK);
     }
 }

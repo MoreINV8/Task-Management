@@ -61,6 +61,20 @@ public class ParticipateService {
         return new SuccessResponse("successfully added to task " + task.getTaskId(), HttpStatus.OK);
     }
 
+    public void removeParticipation(UUID taskId) throws NotFoundTaskException, NotFoundParticipationException {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new NotFoundTaskException(taskId));
+
+        for (Participation p : participationRepository.findAllByTaskTaskId(task.getTaskId())) {
+            ParticipationKey participationKey = new ParticipationKey(task.getTaskId(), p.getMember().getMemberId());
+            System.out.println(participationKey);
+            Participation participation = participationRepository
+                    .findById(participationKey)
+                    .orElseThrow(() -> new NotFoundParticipationException(p.getMember().getMemberId(), taskId));
+            participationRepository.delete(participation);
+        }
+    }
+
     public SuccessResponse removeParticipation(UUID taskId, List<UUID> participants)
             throws NotFoundTaskException, NotFoundMemberException, NotFoundParticipationException {
 

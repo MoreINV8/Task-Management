@@ -71,7 +71,7 @@ public class NotificationService {
         return getResponse(notificationRepository.save(notification));
     }
 
-    public NotificationResponse insertNotification(NotificationSendRequest request, UUID receiverId)
+    public void insertNotification(NotificationSendRequest request, UUID receiverId)
             throws NotFoundTaskException, NotFoundProjectException, NotFoundMeetingException, InvalidRequestException, NotFoundMemberException {
 
         Member receiver = memberRepository.findById(receiverId)
@@ -79,10 +79,10 @@ public class NotificationService {
 
         request.setReceiver(receiver);
 
-        return insertNotification(request);
+        insertNotification(request);
     }
 
-    public NotificationResponse insertNotification(NotificationSendRequest request, String email)
+    public void insertNotification(NotificationSendRequest request, String email)
             throws NotFoundTaskException, NotFoundProjectException, NotFoundMeetingException, InvalidRequestException, NotFoundMemberException {
 
         Member receiver = memberRepository.findMemberByEmail(email);
@@ -93,7 +93,7 @@ public class NotificationService {
 
         request.setReceiver(receiver);
 
-        return insertNotification(request);
+        insertNotification(request);
     }
 
     public List<NotificationResponse> getNotificationFromMemberId(UUID mId)

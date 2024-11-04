@@ -46,7 +46,7 @@ public class CommentController {
 
     @DeleteMapping("/comment/delete")
     public ResponseEntity<CommentResponse> deleteComment(@RequestBody CommentRequest request)
-            throws NotFoundTaskException, NotFoundCommentException, CommentAuthorMismatchException {
-        return new ResponseEntity<>(commentService.deleteComment(request), HttpStatus.OK);
+            throws NotFoundCommentException {
+        return new ResponseEntity<>(commentService.deleteComment(request.getCommentId()), HttpStatus.OK);
     }
 }
